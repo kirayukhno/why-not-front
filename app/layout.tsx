@@ -1,20 +1,22 @@
 import type { Metadata } from "next";
 import TanStackProvider from "@/components/TanStackProvider/TanStackProvider";
-// import { Roboto } from "next/font/google";
+import { Montserrat} from "next/font/google";
 
 
 
-// const roboto = Roboto({
-//   subsets: ["latin"],
-//   weight: ["400", "700"],
-//   variable: "--font-roboto",
-//   display: "swap",
-// });
+const montserrat = Montserrat({
+  subsets: ["cyrillic", "latin"],
+  weight: ["400", "700"],
+  variable: "--font-montserrat",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "Relax Map",
   description:
     "Relax Map is an interactive platform for discovering and sharing the best places to relax and explore.",
+
+
   openGraph: {
     title: "Relax Map",
     description:
@@ -38,7 +40,7 @@ children
 }>) {
   return (
     <html lang="en">
-      <body>
+      <body className={montserrat.variable}>
         <TanStackProvider>
 
             {children}
