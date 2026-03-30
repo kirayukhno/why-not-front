@@ -118,7 +118,7 @@ button:disabled {
   background-color: #ffe5d9;
   border: 1px solid #cc6534;
   color: #1b391b;
-
+}
 .secondary-btn {
   background-color: rgba(0, 0, 0, 0.05);
   border: 1px solid rgba(0, 0, 0, 0.15);
@@ -163,28 +163,15 @@ select:active {
 }
 
 .container {
-
   max-width: 100%;
   margin: 0 auto;
   padding: 0 20px;
-}
-
-@media (min-width: 375px) {
-  .container {
-    max-width: 375px;
-  }
 }
 
 .section {
   padding: 64px 0;
   display: flex;
   justify-content: center;
-}
-
-@media screen and (min-width: 320px) {
-  .container {
-    max-width: calc(100% - 40px);
-  }
 }
 
 @media screen and (min-width: 375px) {
@@ -195,7 +182,7 @@ select:active {
 
 @media screen and (min-width: 768px) {
   .container {
-    max-width: 704px;
+    max-width: 768px;
     padding: 0 32px;
   }
 }
@@ -204,10 +191,9 @@ select:active {
   p {
     font-size: 20px;
   }
-
   .container {
-    max-width: 704px;
-    padding: 0 32px;
+    max-width: 1440px;
+    padding: 0 64px;
   }
 }
 
@@ -223,13 +209,4 @@ select:active {
   clip-path: inset(100%);
   clip: rect(0 0 0 0);
   overflow: hidden;
-}
-
-.hero-bg {
-  background-image:
-    linear-gradient(rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.32)),
-    url("@/images/hero-bg.webp");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
 }
