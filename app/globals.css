@@ -154,7 +154,7 @@ select:active {
 }
 
 .container {
-  max-width: 335px;
+  width: 100%;
   margin: 0 auto;
   padding: 0 20px;
 }
@@ -163,6 +163,18 @@ select:active {
   padding: 64px 0;
   display: flex;
   justify-content: center;
+}
+
+@media screen and (min-width: 320px) {
+  .container {
+    max-width: calc(100% - 40px);
+  }
+}
+
+@media screen and (min-width: 375px) {
+  .container {
+    max-width: 335px;
+  }
 }
 
 @media screen and (min-width: 768px) {
@@ -176,9 +188,10 @@ select:active {
   p {
     font-size: 20px;
   }
+
   .container {
-      max-width: 704px;
-      padding: 0 32px;
+    max-width: 704px;
+    padding: 0 32px;
   }
 }
 
