@@ -176,7 +176,7 @@ select:active {
 
 @media screen and (min-width: 375px) {
   .container {
-    max-width: 335px;
+    max-width: 375px;
   }
 }
 
