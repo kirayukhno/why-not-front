@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   margin-bottom: 309px;
+  width: 100%;
 }
 
 .title {
@@ -59,27 +60,20 @@
 @media screen and (min-width: 768px) {
   .form {
     width: 644px;
-    margin: 0 auto;
+    margin-bottom: 290px;
   }
   .title {
     font-size: 44px;
+    width: 100%;
   }
   .input {
     width: 100%;
-  }
-
-  .button {
-    width: 100%;
-    margin-bottom: 194px;
   }
 }
 
 @media screen and (min-width: 1440px) {
   .form {
     width: 644px;
-    margin: 0 auto;
-  }
-  .button {
     margin-bottom: 267px;
   }
 }

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import styles from "./layout.module.css";
+import "../globals.css";
 
 type Props = {
   children: React.ReactNode;
@@ -23,7 +24,7 @@ export default function AuthLayout({ children }: Props) {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div className={styles.layout}>
+    <div className="container">
       <header className={styles.header}>
         <Image
           src="/logo.svg"
