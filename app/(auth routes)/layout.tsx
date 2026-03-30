@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import styles from "./layout.module.css";
 
 type Props = {
   children: React.ReactNode;
@@ -22,20 +23,21 @@ export default function AuthLayout({ children }: Props) {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div>
-      <header>
+    <div className={styles.layout}>
+      <header className={styles.header}>
         <Image
           src="/logo.svg"
           alt="Relax Map"
-          width={120}
-          height={32}
+          width={24}
+          height={24}
           priority
         />
+        <p>Relax Map</p>
       </header>
 
-      <main>{children}</main>
+      <main className={styles.main}>{children}</main>
 
-      <footer>
+      <footer className={styles.footer}>
         <p>© 2025 Relax Map</p>
       </footer>
     </div>

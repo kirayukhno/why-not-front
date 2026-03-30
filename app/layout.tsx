@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import TanStackProvider from "@/components/TanStackProvider/TanStackProvider";
-import { Montserrat} from "next/font/google";
-
-
+import { Montserrat } from "next/font/google";
+import "./globals.css";
 
 const montserrat = Montserrat({
   subsets: ["cyrillic", "latin"],
@@ -15,7 +14,6 @@ export const metadata: Metadata = {
   title: "Relax Map",
   description:
     "Relax Map is an interactive platform for discovering and sharing the best places to relax and explore.",
-
 
   openGraph: {
     title: "Relax Map",
@@ -34,18 +32,14 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-children
+  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
     <html lang="en">
       <body className={montserrat.variable}>
-        <TanStackProvider>
-
-            {children}
-
-        </TanStackProvider>
+        <TanStackProvider>{children}</TanStackProvider>
       </body>
     </html>
   );
