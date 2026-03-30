@@ -114,7 +114,6 @@ button:disabled {
 }
 .primary-btn:hover,
 .primary-btn:focus {
-
   background-color: #ffe5d9;
   border: 1px solid #cc6534;
   color: #1b391b;
