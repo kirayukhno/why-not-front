@@ -1,0 +1,101 @@
+.placeholderContainer{
+     display: flex;
+  flex-direction: column;
+  align-items: center; 
+  width: 100%;
+  max-width: 375px; 
+  box-sizing: border-box;
+  padding: 20px; 
+  gap: 32px; 
+border-radius: 24px;
+  background-color:#FFE5D9;
+}
+
+
+.placeholderText{
+   font-weight: 700;
+    font-size:18px;
+    letter-spacing: -1%;
+    line-height: 140%;
+}
+
+.actionButton {
+  display: flex;
+  flex-direction: row;
+  align-items: center; 
+  justify-content: center; 
+  gap: 8px;
+
+  width: 100%; 
+  max-width: 295px; 
+  height: 48px; 
+  box-sizing: border-box;
+  padding: 6px 12px; 
+  border: 1px solid #CC6534; 
+  border-radius: var(--radius-small, 8px); 
+
+  background-color: #CC6534; 
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 16px; 
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, transform 0.2s ease-in-out;
+  transform: scale(1);
+  cursor: pointer;
+   color: #FFFFFF;
+   line-height: 150%;
+   letter-spacing: 0%;
+}
+
+.actionButton:hover {
+  background-color: #CC6534; 
+  color: #FFFFFF;
+ transform: scale(1.05); 
+ border: 1px solid #cc6534;
+
+}
+
+.actionButton:active,
+.actionButton:focus {
+  background-color: #CC6534;
+  color: #FFFFFF;
+  transform: scale(1); 
+}
+
+.actionButton:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: scale(1) !important; 
+}
+
+@media (min-width: 768px) {
+.placeholderContainer{
+     align-items: flex-start;
+  max-width: 533px; 
+  padding: 40px 32px; 
+
+  gap: 32px; 
+}
+
+.actionButton{
+width: fit-content; 
+    max-width: none;
+    font-size:16px;
+    font-weight: 500;
+    padding:12px; 
+
+}
+.placeholderText{
+        font-size:26px;
+    }
+ .actionButton{
+        font-size:20px;
+          padding:9px 12px; 
+    }
+
+
+}
+
+
+
+
+
