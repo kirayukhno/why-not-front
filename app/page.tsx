@@ -5,10 +5,8 @@ import Advantages from "@/components/Advantages/Advantages";
 export default function Home() {
   return (
     <main>
-      <div className="container hero-bg">
-        <Hero />
-      </div>
       <div className="container">
+        <Hero />
         <Advantages />
       </div>
     </main>
