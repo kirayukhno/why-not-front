@@ -1,0 +1,48 @@
+.popularLocations {
+  max-width: 100%;
+  padding-top: 64px;
+  padding-bottom: 64px;
+}
+.title {
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 120%;
+  letter-spacing: -1%;
+}
+
+.popularLocationsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.button {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 150%;
+  letter-spacing: 0%;
+  padding-left: 12px;
+  padding-right: 12px;
+  text-wrap: nowrap;
+}
+
+@media (min-width: 768px) {
+  .title {
+    font-size: 44px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .popularLocations {
+    padding-top: 72px;
+    padding-bottom: 72px;
+  }
+  .title {
+    font-size: 52px;
+  }
+
+  .button {
+    font-size: 20px;
+  }
+}

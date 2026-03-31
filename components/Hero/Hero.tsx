@@ -12,8 +12,12 @@ export default function Hero() {
           мандрівників.
         </p>
         <div className={css.heroSearch}>
-          <button>Введіть назву, тип або регіон...</button>
-          <button>Знайти місце</button>
+          <input
+            className={css.regionInput}
+            type="text"
+            placeholder="Введіть назву, тип або регіон..."
+          />
+          <button className={css.button + " primary-btn"}>Знайти місце</button>
         </div>
       </div>
     </section>
