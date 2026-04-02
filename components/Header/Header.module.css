@@ -7,18 +7,28 @@
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
-.logo a {
+  .logo {
+  display: flex;
   font-weight: bold;
-  font-size: 24px;
+  font-size: 19px;
   color: #333;
-  text-decoration: none;
+  align-items: center; 
+  gap: 8px; 
+  text-decoration: none; 
 }
+
 
 .nav a {
   margin-left: 20px;
   text-decoration: none;
   color: #333;
   font-weight: 500;
+}
+
+.logo span {
+  font-size: 18px;
+  font-weight: 600;
+  color: black;
 }
 
 .shareBtn {

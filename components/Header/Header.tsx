@@ -1,5 +1,6 @@
 "use client";
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import styles from './Header.module.css';
@@ -11,13 +12,16 @@ import { useAuth } from '@/hooks/useAuth';
 
   return (
     <header className={styles.header}>
-      <Link href="/">Relax Map</Link>
-
+        
+    <Link href="/" className={styles.logo}>
+      <Image src="/logo.svg" alt="logo" width={24} height={24} />
+      <span>Relax Map</span>
+    </Link>
       <nav>
         {isAuthenticated ? (
           <>
             <Link href="/locations">Місця відпочинку</Link>
-            <Link href="/pro">Мій Профіль</Link>
+            <Link href="/profile">Мій Профіль</Link>
             <Link href="/locations/add">Поділитись локацією</Link>
             <span>{user?.name}</span>
             <button onClick={() => setShowModal(true)}>Вихід</button>
@@ -26,8 +30,8 @@ import { useAuth } from '@/hooks/useAuth';
           <>
             <Link href="/">Головна</Link>
             <Link href="/locations">Місця відпочинку</Link>
-            <Link href="/login">Вхід</Link>
-            <Link href="/signup">Реєстрація</Link>
+            <Link href="/sign-in">Вхід</Link>
+            <Link href="/sign-up">Реєстрація</Link>
           </>
         )}
       </nav>
