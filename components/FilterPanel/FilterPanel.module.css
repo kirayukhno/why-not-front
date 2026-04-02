@@ -1,0 +1,234 @@
+.wrapper {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "search search"
+    "type region"
+    "sort sort";
+  gap: 12px 10px;
+  margin-bottom: 24px;
+}
+
+.input,
+.select,
+.sortSelect,
+.typeTrigger {
+  width: 100%;
+  height: 43px;
+  padding: 8px 36px 8px 12px;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 400;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  background-color: #ffe5d9;
+  color: rgba(0, 0, 0, 0.6);
+  box-shadow: none;
+}
+
+.input {
+  grid-area: search;
+}
+
+.select {
+  grid-area: region;
+}
+
+.sortSelect {
+  grid-area: sort;
+}
+
+.typeDropdown {
+  grid-area: type;
+  position: relative;
+  width: 100%;
+}
+
+.input:focus,
+.select:focus,
+.sortSelect:focus,
+.typeTrigger:focus {
+  outline: none;
+  border-color: #cc6534;
+  box-shadow: 0 0 0 3px rgba(204, 101, 52, 0.12);
+}
+
+.select,
+.sortSelect {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 6L8 10L12 6' stroke='%236B5B53' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px 16px;
+}
+
+.typeTrigger {
+  appearance: none;
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.typeTrigger span {
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.typeTrigger::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 16px;
+  height: 16px;
+  transform: translateY(-50%);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 6L8 10L12 6' stroke='%236B5B53' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 16px 16px;
+}
+
+.arrow {
+  display: none;
+}
+
+.typeMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 10;
+  width: 100%;
+  min-width: 198px;
+  padding: 10px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  background: #ffe5d9;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #0d0b0a;
+}
+
+.checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+  border-radius: 4px;
+  background-color: #ffe5d9;
+  display: inline-grid;
+  place-content: center;
+  transition:
+    background-color 250ms cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 250ms cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.checkbox::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  transform: scale(0);
+  transition: transform 200ms ease-in-out;
+  border-radius: 2px;
+  background-color: #ffffff;
+}
+
+.checkbox:checked {
+  background-color: #cc6534;
+  border-color: #cc6534;
+}
+
+.checkbox:checked::before {
+  transform: scale(1);
+}
+
+.checkbox:hover,
+.checkboxLabel:hover .checkbox {
+  border-color: #cc6534;
+}
+
+.checkbox:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(204, 101, 52, 0.2);
+}
+
+.emptyText {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* tablet */
+@media screen and (min-width: 768px) {
+  .wrapper {
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-areas:
+      "search search search search search search search search search search search search"
+      "type type type type region region region region . . sort sort";
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .input {
+    width: 100%;
+  }
+
+  .typeDropdown,
+  .select,
+  .sortSelect {
+    width: 100%;
+    max-width: none;
+  }
+
+  .sortSelect {
+    justify-self: stretch;
+  }
+}
+
+/* desktop */
+@media screen and (min-width: 1440px) {
+  .wrapper {
+    grid-template-columns: 310px 199px 198px 1fr 160px;
+    grid-template-areas: "search region type . sort";
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+
+  .input {
+    width: 310px;
+  }
+
+  .select {
+    width: 199px;
+  }
+
+  .typeDropdown {
+    width: 198px;
+  }
+
+  .sortSelect {
+    width: 160px;
+    justify-self: end;
+  }
+}
