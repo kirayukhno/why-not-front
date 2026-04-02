@@ -1,6 +1,6 @@
 import styles from './page.module.css';
 import ProfileInfo from '@/components/Profile/ProfileInfo';
-import LocationsGrid from '@/components/Shared/LocationsGrid';//імпортувати коли інший розробник напише 
+// import LocationsGrid from '@/components/Shared/LocationsGrid';//імпортувати коли інший розробник напише 
 import ProfilePlaceholder from '@/components/Profile/ProfilePlaceholder';
 import { notFound } from 'next/navigation';
 import { cookies } from 'next/headers';
@@ -40,7 +40,8 @@ export default async function ProfilePage({ params }: PageProps) {
       <div className={styles.locationsSection}>
         {!isOwner && <h2 className={styles.sectionTitle}>Локації</h2>}
         {userLocations.length > 0 ? (
-          <LocationsGrid locations={userLocations} />
+          // <LocationsGrid locations={userLocations} />
+          <div>Locations will be displayed here</div>
         ) : (
           <ProfilePlaceholder isOwner={isOwner} />
         )}

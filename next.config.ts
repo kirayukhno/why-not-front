@@ -1,6 +1,6 @@
-import type { NextConfig } from "next";
+//import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
+/* const nextConfig: NextConfig = {
   reactCompiler: true,
   turbopack: {
     root: __dirname,
@@ -14,5 +14,7 @@ const nextConfig: NextConfig = {
     ],
   },
 };
-
+ */
+const nextConfig = {};
 export default nextConfig;
+
