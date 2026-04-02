@@ -3,6 +3,7 @@ import TanStackProvider from "@/components/TanStackProvider/TanStackProvider";
 import { Montserrat } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
+import Layout from '@/components/Layout/Layout';
 
 const montserrat = Montserrat({
   subsets: ["cyrillic", "latin"],
@@ -40,9 +41,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={montserrat.variable}>
+       {/*  <Layout>{children}</Layout> */}
         <TanStackProvider>{children}</TanStackProvider>
         <Toaster position="top-right" />
       </body>
     </html>
   );
 }
+
+
