@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import styles from './Header.module.css';
-//.\.\services\auth.ts';
 import { useAuth } from '@/hooks/useAuth';  
 
   const Header = () => {
@@ -20,9 +19,7 @@ import { useAuth } from '@/hooks/useAuth';
             <Link href="/locations">Місця відпочинку</Link>
             <Link href="/pro">Мій Профіль</Link>
             <Link href="/locations/add">Поділитись локацією</Link>
-
             <span>{user?.name}</span>
-
             <button onClick={() => setShowModal(true)}>Вихід</button>
           </>
         ) : (
