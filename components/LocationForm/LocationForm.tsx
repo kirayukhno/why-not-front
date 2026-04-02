@@ -6,7 +6,10 @@ import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import toast from 'react-hot-toast';
 import css from './LocationForm.module.css';
-import { createLocation } from '@/lib/api/locations';
+import {
+  createLocation,
+  updateLocation,
+} from '@/lib/api/locations';
 
 type LocationFormValues = {
   name: string;
@@ -16,39 +19,46 @@ type LocationFormValues = {
   image: File | null;
 };
 
-const initialValues: LocationFormValues = {
-  name: '',
-  type: '',
-  region: '',
-  description: '',
-  image: null,
+type LocationInitialData = {
+  _id: string;
+  name: string;
+  type: string;
+  region: string;
+  description: string;
+  image?: string;
+};
+
+type LocationFormProps = {
+  mode?: 'create' | 'edit';
+  locationId?: string;
+  initialData?: LocationInitialData;
 };
 
 const validationSchema = Yup.object({
   name: Yup.string()
     .min(3, 'Мінімум 3 символи')
     .max(96, 'Максимум 96 символів')
-    .required('Обов’язкове поле'),
+    .required("Це поле є обов'язковим"),
   type: Yup.string()
     .max(64, 'Максимум 64 символи')
-    .required('Обов’язкове поле'),
+    .required("Це поле є обов'язковим"),
   region: Yup.string()
     .max(64, 'Максимум 64 символи')
-    .required('Обов’язкове поле'),
+    .required("Це поле є обов'язковим"),
   description: Yup.string()
     .min(20, 'Мінімум 20 символів')
     .max(6000, 'Максимум 6000 символів')
-    .required('Обов’язкове поле'),
-  image: Yup.mixed<File>()
-    .required('Фото є обов’язковим')
-    .test('fileType', 'Дозволені лише JPG або PNG', (value) => {
-      if (!value) return false;
-      return ['image/jpeg', 'image/png'].includes(value.type);
-    })
-    .test('fileSize', 'Розмір файлу має бути менше 1MB', (value) => {
-      if (!value) return false;
-      return value.size <= 1024 * 1024;
-    }),
+    .required("Це поле є обов'язковим"),
+  image: Yup.mixed<File | null>().test(
+    'fileValidation',
+    'Фото має бути JPG/PNG і менше 1MB',
+    (value) => {
+      if (!value) return true;
+      const validType = ['image/jpeg', 'image/png'].includes(value.type);
+      const validSize = value.size <= 1024 * 1024;
+      return validType && validSize;
+    }
+  ),
 });
 
 const typeOptions = [
@@ -67,9 +77,23 @@ const regionOptions = [
   { value: 'Zakarpattia', label: 'Закарпатська область' },
 ];
 
-export default function LocationForm() {
+export default function LocationForm({
+  mode = 'create',
+  locationId,
+  initialData,
+}: LocationFormProps) {
   const router = useRouter();
-  const [preview, setPreview] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>(
+    initialData?.image || null
+  );
+
+  const initialValues: LocationFormValues = {
+    name: initialData?.name || '',
+    type: initialData?.type || '',
+    region: initialData?.region || '',
+    description: initialData?.description || '',
+    image: null,
+  };
 
   const handleSubmit = async (
     values: LocationFormValues,
@@ -87,9 +111,16 @@ export default function LocationForm() {
         formData.append('images', values.image);
       }
 
-      const data = await createLocation(formData);
+      const data =
+        mode === 'edit' && locationId
+          ? await updateLocation(locationId, formData)
+          : await createLocation(formData);
 
-      toast.success('Локацію успішно створено');
+      toast.success(
+        mode === 'edit'
+          ? 'Локацію успішно оновлено'
+          : 'Локацію успішно створено'
+      );
 
       router.push(`/locations/${data.data._id}`);
     } catch (error) {
@@ -106,19 +137,13 @@ export default function LocationForm() {
       initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
+      enableReinitialize
     >
-      {({
-        setFieldValue,
-        resetForm,
-        isSubmitting,
-        touched,
-        errors,
-        values,
-      }) => (
+      {({ setFieldValue, resetForm, isSubmitting, touched, errors }) => (
         <Form className={css.form}>
           <div className={css.fieldGroup}>
             <label className={css.label} htmlFor="image">
-              Завантажте фото
+              Фото локації
             </label>
 
             <div className={css.previewWrapper}>
@@ -148,8 +173,6 @@ export default function LocationForm() {
                 if (file) {
                   const objectUrl = URL.createObjectURL(file);
                   setPreview(objectUrl);
-                } else {
-                  setPreview(null);
                 }
               }}
             />
@@ -177,12 +200,7 @@ export default function LocationForm() {
             <label className={css.label} htmlFor="type">
               Тип місця
             </label>
-            <Field
-              as="select"
-              id="type"
-              name="type"
-              className={css.select}
-            >
+            <Field as="select" id="type" name="type" className={css.select}>
               {typeOptions.map((option) => (
                 <option key={option.value || 'empty-type'} value={option.value}>
                   {option.label}
@@ -238,15 +256,19 @@ export default function LocationForm() {
               className="primary-btn"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Збереження...' : 'Опублікувати'}
+              {isSubmitting
+                ? 'Збереження...'
+                : mode === 'edit'
+                  ? 'Зберегти зміни'
+                  : 'Опублікувати'}
             </button>
 
             <button
               type="button"
               className="secondary-btn"
               onClick={() => {
-                resetForm({ values: initialValues });
-                setPreview(null);
+                resetForm();
+                setPreview(initialData?.image || null);
               }}
               disabled={isSubmitting}
             >
