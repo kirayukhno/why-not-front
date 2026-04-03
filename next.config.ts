@@ -1,7 +1,6 @@
-//import type { NextConfig } from "next";
+import type { NextConfig } from "next";
 
-/* const nextConfig: NextConfig = {
-  reactCompiler: true,
+const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
@@ -14,7 +13,5 @@
     ],
   },
 };
- */
-const nextConfig = {};
-export default nextConfig;
 
+export default nextConfig;
