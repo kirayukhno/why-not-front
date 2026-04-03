@@ -49,7 +49,9 @@ const validationSchema = Yup.object({
     .min(20, 'Мінімум 20 символів')
     .max(6000, 'Максимум 6000 символів')
     .required("Це поле є обов'язковим"),
-  image: Yup.mixed<File | null>().test(
+image: Yup.mixed<File>()
+  .nullable()
+  .test(
     'fileValidation',
     'Фото має бути JPG/PNG і менше 1MB',
     (value) => {
