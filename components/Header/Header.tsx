@@ -20,7 +20,7 @@ const Header = () => {
           <span>Relax Map</span>
         </Link>
         <div className={styles.container}>
-          {!isAuthenticated ? (
+          {isAuthenticated ? (
             <>
               <nav className={styles.nav}>
                 <Link href="/locations" className={styles.link}>
@@ -65,7 +65,7 @@ const Header = () => {
             <span className={isOpen ? styles.lineActive : ""}></span>
           </button>
           {/* Mobile menu */}
-          {!isAuthenticated ? (
+          {isAuthenticated ? (
             <>
               <div
                 className={`${styles.mobileMenu} ${isOpen ? styles.open : ""}`}
@@ -113,12 +113,38 @@ const Header = () => {
         </div>
 
         {showModal && (
-          <div>
-            <p>Вийти?</p>
-            <button onClick={() => setShowModal(false)}>Ні</button>
-            <button onClick={logout}>Так</button>
-          </div>
-        )}
+  <>
+    {/* Overlay */}
+    <div
+      className={styles.modalOverlay}
+      onClick={() => setShowModal(false)}
+    ></div>
+
+    {/* Modal */}
+    <div className={styles.modal}>
+      <p className={styles.modalText}>Вийти з акаунту?</p>
+
+      <div className={styles.modalActions}>
+        <button
+          className={styles.cancelBtn}
+          onClick={() => setShowModal(false)}
+        >
+          Ні
+        </button>
+
+        <button
+          className={styles.confirmBtn}
+          onClick={() => {
+            logout();
+            setShowModal(false);
+          }}
+        >
+          Так
+        </button>
+      </div>
+    </div>
+  </>
+)}
       </div>
     </header>
   );
