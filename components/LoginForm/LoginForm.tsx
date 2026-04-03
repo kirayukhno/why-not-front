@@ -1,10 +1,21 @@
 "use client";
 
-import { useFormik } from "formik";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import type { FormikHelpers } from "formik";
 import * as Yup from "yup";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import styles from "./LoginForm.module.css";
+
+type LoginData = {
+  email: string;
+  password: string;
+};
+
+const initialValues: LoginData = {
+  email: "",
+  password: "",
+};
 
 const validationSchema = Yup.object({
   email: Yup.string()
@@ -22,72 +33,85 @@ export default function LoginForm() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("from") ?? "/";
 
-  const formik = useFormik({
-    initialValues: { email: "", password: "" },
-    validationSchema,
-    onSubmit: async (values) => {
-      try {
-        const res = await fetch("/api/auth/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(values),
-        });
+  const handleSubmit = async (
+    values: LoginData,
+    actions: FormikHelpers<LoginData>,
+  ) => {
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
 
-        if (!res.ok) {
-          const data = await res.json();
-          throw new Error(data.message ?? "Помилка входу");
-        }
-
-        router.push(redirectTo);
-      } catch (error) {
-        toast.error(error instanceof Error ? error.message : "Помилка входу");
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message ?? "Помилка входу");
       }
-    },
-  });
+
+      router.push(redirectTo);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Помилка входу");
+    } finally {
+      actions.setSubmitting(false);
+    }
+  };
 
   return (
-    <form className={styles.form} onSubmit={formik.handleSubmit} noValidate>
-      <h1 className={styles.title}>Вхід</h1>
+    <Formik
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+      onSubmit={handleSubmit}
+    >
+      {({ isSubmitting }) => (
+        <Form className={styles.form} noValidate>
+          <h1 className={styles.title}>Вхід</h1>
 
-      <div className={styles.field}>
-        <label className={styles.label} htmlFor="email">
-          Пошта*
-        </label>
-        <input
-          id="email"
-          type="email"
-          placeholder="hello@relaxmap.ua"
-          className={`${styles.input} ${formik.touched.email && formik.errors.email ? styles.inputError : ""}`}
-          {...formik.getFieldProps("email")}
-        />
-        {formik.touched.email && formik.errors.email && (
-          <span className={styles.error}>{formik.errors.email}</span>
-        )}
-      </div>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="email">
+              Пошта*
+            </label>
+            <Field
+              id="email"
+              name="email"
+              type="email"
+              placeholder="hello@relaxmap.ua"
+              className={styles.input}
+            />
+            <ErrorMessage
+              name="email"
+              component="span"
+              className={styles.error}
+            />
+          </div>
 
-      <div className={styles.field}>
-        <label className={styles.label} htmlFor="password">
-          Пароль*
-        </label>
-        <input
-          id="password"
-          type="password"
-          placeholder="••••••••"
-          className={`${styles.input} ${formik.touched.password && formik.errors.password ? styles.inputError : ""}`}
-          {...formik.getFieldProps("password")}
-        />
-        {formik.touched.password && formik.errors.password && (
-          <span className={styles.error}>{formik.errors.password}</span>
-        )}
-      </div>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="password">
+              Пароль*
+            </label>
+            <Field
+              id="password"
+              name="password"
+              type="password"
+              placeholder="••••••••"
+              className={styles.input}
+            />
+            <ErrorMessage
+              name="password"
+              component="span"
+              className={styles.error}
+            />
+          </div>
 
-      <button
-        type="submit"
-        className={`primary-btn ${styles.button}`}
-        disabled={formik.isSubmitting}
-      >
-        Увійти
-      </button>
-    </form>
+          <button
+            type="submit"
+            className={`primary-btn ${styles.button}`}
+            disabled={isSubmitting}
+          >
+            Увійти
+          </button>
+        </Form>
+      )}
+    </Formik>
   );
 }
