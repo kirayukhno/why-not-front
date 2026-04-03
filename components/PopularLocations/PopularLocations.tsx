@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import type { Swiper as SwiperInstance } from "swiper";
 import { usePopularLocations } from "@/lib/api/locations";
+import Loader from "@/components/Loader/Loader";
 import css from "./PopularLocations.module.css";
 import "swiper/css";
 
@@ -32,13 +33,13 @@ const renderStars = (rating: number) => {
   );
 };
 
-// Компонент Loader
-const Loader = () => (
-  <div className={css.loader}>
-    <div className={css.spinner}></div>
-    <p>Завантаження локацій...</p>
-  </div>
-);
+// // Компонент Loader
+// const Loader = () => (
+//   <div className={css.loader}>
+//     <div className={css.spinner}></div>
+//     <p>Завантаження локацій...</p>
+//   </div>
+// );
 
 // Компонент Error
 const ErrorMessage = ({ message }: { message: string }) => (
