@@ -1,0 +1,45 @@
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.empty {
+  text-align: center;
+  font-size: 18px;
+}
+
+.loading {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 18px;
+}
+
+.buttonWrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 32px;
+}
+
+.buttonWrap button {
+  width: 160px;
+  height: 48px;
+  font-size: 16px;
+}
+
+.buttonWrap button:hover,
+.buttonWrap button:focus {
+  cursor: pointer;
+}
+
+@media screen and (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media screen and (min-width: 1440px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

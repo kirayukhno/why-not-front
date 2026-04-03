@@ -1,15 +1,15 @@
+// Components
+import Hero from "@/components/Hero/Hero";
+import Advantages from "@/components/Advantages/Advantages";
+import PopularLocations from "@/components/PopularLocations/PopularLocations";
 
 export default function Home() {
   return (
     <main>
-      <div>
-        <h1>Welcome</h1>
-        <p>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae, nulla.
-        </p>
-        <p>
-Lorem, ipsum dolor sit amet consectetur adipisicing elit. Voluptatum, adipisci?
-        </p>
+      <div className="container">
+        <Hero />
+        <Advantages />
+        <PopularLocations />
       </div>
     </main>
   );
