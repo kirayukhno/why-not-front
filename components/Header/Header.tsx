@@ -6,12 +6,35 @@ import { useState } from "react";
 import styles from "./Header.module.css";
 import { useAuth } from "@/hooks/useAuth";
 
+type LogoutModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+};
+
+function LogoutModal({ isOpen, onClose, onConfirm }: LogoutModalProps) {
+  if (!isOpen) return null;
+
+  return (
+    <div className={styles.overlay}>
+      <div>
+        <p>Ви дійсно хочете вийти?</p>
+        <button type="button" onClick={onConfirm}>
+          Так
+        </button>
+        <button type="button" onClick={onClose}>
+          Ні
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function Header() {
   const { isAuthenticated, user, logout } = useAuth();
 
   const [isOpen, setIsOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
   const toggleMenu = () => setIsOpen(!isOpen);
 
   return (
