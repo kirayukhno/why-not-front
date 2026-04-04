@@ -5,14 +5,17 @@ import Link from "next/link";
 import { useState } from "react";
 import styles from "./Header.module.css";
 import { useAuth } from "@/hooks/useAuth";
+import { useParams } from "next/navigation";
 
 const Header = () => {
   const { isAuthenticated, user, logout } = useAuth();
   const [showModal, setShowModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const toggleMenu = () => setIsOpen(!isOpen);
-
+  const params = useParams();
+  const isMyProfilePage = user?.data?._id === params.userId;
   return (
+    
     <header className={styles.header}>
       <div className={styles.container}>
         <Link href="/" className={styles.logo}>
@@ -26,13 +29,17 @@ const Header = () => {
                 <Link href="/locations" className={styles.link}>
                   Місця відпочинку
                 </Link>
-                <Link href="/profile" className={styles.link}>
-                  Мій Профіль
-                </Link>
-                <Link href="/locations/add" className={styles.link}>
-                  Поділитись локацією
-                </Link>
-                <span>{user?.name}</span>
+               {isMyProfilePage && (
+                  <>
+                    <Link href={`/profile/${user?.data?._id}`} className={styles.link}>
+                      Мій Профіль
+                    </Link>
+                    <Link href="/locations/add" className={styles.link}>
+                      Поділитись локацією
+                    </Link>
+                  </>
+                )}
+                <span>{user?.data?.name}</span>
               </nav>
               <div className={styles.actions}>
                 <button onClick={() => setShowModal(true)}>Вихід</button>
@@ -74,7 +81,7 @@ const Header = () => {
                   <Link href="/locations" onClick={toggleMenu}>
                     Місця відпочинку
                   </Link>
-                  <Link href="/profile" onClick={toggleMenu}>
+                  <Link href={`/profile/${user?.data?._id}`} onClick={toggleMenu}>
                     Мій Профіль
                   </Link>
                   <Link href="/locations/add" onClick={toggleMenu}>
