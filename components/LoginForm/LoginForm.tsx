@@ -5,12 +5,8 @@ import type { FormikHelpers } from "formik";
 import * as Yup from "yup";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
+import { login, type LoginData } from "@/lib/api/clientApi";
 import styles from "./LoginForm.module.css";
-
-type LoginData = {
-  email: string;
-  password: string;
-};
 
 const initialValues: LoginData = {
   email: "",
@@ -38,17 +34,7 @@ export default function LoginForm() {
     actions: FormikHelpers<LoginData>,
   ) => {
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? "Помилка входу");
-      }
-
+      await login(values);
       router.push(redirectTo);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Помилка входу");

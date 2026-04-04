@@ -1,5 +1,5 @@
-import { cookies } from 'next/headers';
-import { nextServer } from './api';
+import { cookies } from "next/headers";
+import { nextServer } from "./api";
 
 export const serverUserService = {
   getCurrentUser: async () => {
@@ -7,9 +7,9 @@ export const serverUserService = {
       const cookieStore = await cookies();
       const cookieHeader = cookieStore.toString();
 
-      const res = await nextServer.get('/users/current', {
+      const res = await nextServer.get("/users/current", {
         headers: {
-          Cookie: cookieHeader, 
+          Cookie: cookieHeader,
         },
       });
       return res.data;
@@ -37,5 +37,5 @@ export const serverUserService = {
       console.error(`Server API Error (getUserLocations):`, error);
       return { data: { data: [], totalItems: 0 } };
     }
-  }
+  },
 };

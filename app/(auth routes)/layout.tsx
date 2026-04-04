@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import styles from "./layout.module.css";
 import "../globals.css";
 
@@ -25,17 +24,6 @@ export default function AuthLayout({ children }: Props) {
 
   return (
     <div className="container">
-      <header className={styles.header}>
-        <Image
-          src="/logo.svg"
-          alt="Relax Map"
-          width={24}
-          height={24}
-          priority
-        />
-        <p>Relax Map</p>
-      </header>
-
       <main className={styles.main}>{children}</main>
 
       <footer className={styles.footer}>

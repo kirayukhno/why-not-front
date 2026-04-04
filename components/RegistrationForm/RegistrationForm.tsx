@@ -5,13 +5,8 @@ import type { FormikHelpers } from "formik";
 import * as Yup from "yup";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
+import { register, type RegisterData } from "@/lib/api/clientApi";
 import styles from "./RegistrationForm.module.css";
-
-type RegisterData = {
-  name: string;
-  email: string;
-  password: string;
-};
 
 const initialValues: RegisterData = {
   name: "",
@@ -44,17 +39,7 @@ export default function RegistrationForm() {
     actions: FormikHelpers<RegisterData>,
   ) => {
     try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error ?? "Помилка реєстрації");
-      }
-
+      await register(values);
       router.push(redirectTo);
     } catch (error) {
       toast.error(
