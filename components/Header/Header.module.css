@@ -1,60 +1,103 @@
 .header {
-  width: 100%;
-  border-bottom: 1px solid #eee;
-  background-color: #FFF2EC;
+  border-bottom: 1px solid #E4E7EC;
+  background: #fff;
 }
 
 .container {
-  max-width: 100%;
-  padding: 12px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 12px 16px;
 }
 
-/* 🔹 Logo */
 .logo {
   display: flex;
   align-items: center;
   gap: 8px;
   font-weight: 600;
+  color: #101828;
   text-decoration: none;
-  color: #000;
+}
+
+.nav {
+  display: none;
+}
+.mainlocations {
+  display: none; 
+  align-items: center;
+  justify-content: center;
+}
+.linkmain, .linklocations {
+  color: #344054;
+  text-decoration: none;
+  transition: 0.2s;
+}
+
+.linkmain:hover {
+  color: #CC6534;
+}
+.linklocations:hover {
+  color: #CC6534;
+}
+
+/*  right */
+.right {
+  display: none;
+}
+
+/*  user block */
+.userBlock {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  display: none;
+}
+
+.avatar {
+  border-radius: 50%;
+}
+
+.userName {
+  font-weight: 500;
+  color: #101828;
+}
+
+.logout {
+  background: none;
+  border: none;
+  color: #CC6534;
   cursor: pointer;
 }
 
-.logo:hover {
-  opacity: 0.8;
+.logout:hover {
+  text-decoration: underline;
 }
 
-/* 🔹 Burger button */
+/*  burger */
 .burger {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  background: none;
   border: none;
+  background: none;
   cursor: pointer;
-  z-index: 1001;
 }
 
 .burger span {
   width: 24px;
   height: 2px;
   background: #000;
-  transition: 0.3s;
 }
 
-/* 🔹 Mobile menu */
+/*  mobile menu */
 .mobileMenu {
   position: fixed;
   top: 0;
   right: -100%;
-  width: 70%;
+  width: 75%;
   height: 100vh;
   background: #fff;
   transition: 0.3s;
-  z-index: 1000;
   padding: 80px 20px;
 }
 
@@ -65,42 +108,34 @@
 .mobileNav {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
 }
 
-.mobileNav a {
-  text-decoration: none;
-  color: #000;
-  font-size: 18px;
-  cursor: pointer;
+/*  overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
 }
 
-.mobileNav a:hover {
-  color: #555;
-}
-
-/* 🔹 Hide desktop on mobile */
-.nav
- {
-  display: none;
-}
-.actions {
-  display: none;
-}
-
-/* 🔹 Tablet */
-@media screen and (min-width: 768px) {
-/* 🔹 Actions */
-.nav {
-    display: none;
+/* ***************************************** tablet */
+@media (min-width: 768px) {
+  .nav {
+    display: flex;
     gap: 24px;
+    margin-left: auto;
   }
-.actions {
-  display: flex;
-  gap: 8px;
-  align-items: right;
+.mainlocations {
+  display: none; 
 }
+  .right {
+    display: flex;
+  }
 
+  .burger {
+    display: flex;
+  }
+ 
 .login,
 .register {
   padding: 6px 12px;
@@ -127,113 +162,34 @@
 
 .register:hover {
   opacity: 0.8;
-}  .container {
-    padding: 16px 32px;
+}  
+  .sharelocation {
+  background-color: #CC6534;
+  color: #fff;
   }
-
-  .link {
-    text-decoration: none;
-    color: #000;
-    cursor: pointer;
-    transition: 0.3s;
+  .sharelocation:hover {
+    opacity: 0.8;
   }
-
-  .link:hover {
-    color: #555;
-  }
-
-}
-
-/* 🔹 Desktop */
-@media screen and (min-width: 1440px) {
-  .container {
-    max-width: 1440px;
-    margin-left: auto;
-  }
-  .nav {
-    display: flex;
-    gap: 24px;
-    margin-left: auto; }
-
-    .actions {
-    display: flex;
-    gap: 12px;
-      align-items: right;
-  }
-    .mobileMenu {
-    display: none;
-  }
-   .burger {
+  .userBlock {
   display: none;
 }
 
 }
-/* Overlay */
-.modalOverlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 2000;
-}
-/*  Modal */
-.modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  
-  background: #fff;
-  padding: 24px;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 320px;
 
-  z-index: 2001;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-  text-align: center;
+/* ***************************************** desktop */
+@media (min-width: 1440px) {
+  .container {
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+  .mainlocations {
+  display: flex; 
 }
-
-/* текст */
-.modalText {
-  font-size: 16px;
-  margin-bottom: 20px;
-}
-
-/* кнопки */
-.modalActions {
+ .userBlock {
   display: flex;
-  justify-content: space-between;
-  gap: 12px;
 }
+.burger {
+    display: none;
+  }
 
-.cancelBtn,
-.confirmBtn {
-  flex: 1;
-  padding: 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  border: none;
-  transition: 0.3s;
-}
-
-/* cancel */
-.cancelBtn {
-  background: #f2f2f2;
-}
-
-.cancelBtn:hover {
-  background: #e0e0e0;
-}
-
-/* confirm */
-.confirmBtn {
-  background: #CC6534;
-  color: #fff;
-}
-
-.confirmBtn:hover {
-  opacity: 0.85;
 }
