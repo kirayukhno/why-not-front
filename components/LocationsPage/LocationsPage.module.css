@@ -1,0 +1,39 @@
+.sectionOverride {
+  width: 100%;
+}
+
+.pageWrap {
+  width: 100%;
+  max-width: 1312px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.title {
+  margin-bottom: 32px;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  color: #0d0b0a;
+}
+
+@media screen and (min-width: 768px) {
+  .pageWrap {
+    padding: 0 32px;
+  }
+
+  .title {
+    font-size: 44px;
+  }
+}
+
+@media screen and (min-width: 1440px) {
+  .pageWrap {
+    padding: 0;
+  }
+
+  .title {
+    font-size: 52px;
+  }
+}

@@ -1,0 +1,123 @@
+.backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.25);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    width: 334px;
+    height: 382px;
+    border-radius: 24px;
+    background-color: #fff2ec;
+    padding: 64px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.closeButton {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    border: none;
+    width: 32px;
+    height: 32px;
+    line-height: 0;
+    background: none;
+    fill: #fff;
+    stroke: #000;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    opacity: 1;
+    transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.closeButton:hover,
+.closeButton:focus {
+    opacity: 0.5;
+}
+
+.message {
+    font-weight: 700;
+    font-size: 26px;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    text-align: center;
+    padding-bottom: 16px;
+}
+
+.details {
+    text-align: center;
+    padding-bottom: 32px;
+}
+
+.options {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+    max-width: 294px;
+}
+
+.options>* {
+    line-height: 1.5;
+    height: 48px;
+    white-space: nowrap;
+}
+
+@media screen and (min-width: 768px) {
+    .modal {
+        width: 704px;
+        height: 286px;
+        max-width: 768px;
+    }
+
+    .message {
+        font-size: 32px;
+    }
+
+    .options {
+        flex-direction: row;
+        justify-content: space-between;
+        max-width: 430px;
+    }
+
+    .options>* {
+        width: 100%;
+        max-width: 203px;
+    }
+}
+
+@media screen and (min-width: 1440px) {
+    .modal {
+        width: 768px;
+        height: 312px;
+        max-width: 768px;
+        padding: 64px;
+    }
+
+    .message {
+        font-size: 48px;
+    }
+
+    .details {
+        font-size: 20px;
+    }
+
+    .options>* {
+        font-size: 20px;
+    }
+}

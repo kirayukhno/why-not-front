@@ -1,0 +1,54 @@
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 335px; 
+  margin: 0 auto; 
+  gap: 32px; 
+}
+
+.locationsSection {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+    gap: 40px; 
+}
+
+.sectionTitle {
+  margin: 0;
+  color: #000000;
+  font-size: 28px; 
+  font-weight: 700;
+  text-align: left; 
+}
+
+
+
+@media (min-width: 768px) {
+
+  .wrapper {
+    max-width: 704px; 
+  }
+
+  .sectionTitle {
+    font-size: 44px; 
+  }
+
+}
+
+
+@media (min-width: 1440px) {
+   
+  .wrapper {
+    max-width: 1312px; 
+     gap: 48px; 
+  }
+
+  .sectionTitle {
+    font-size: 52px; 
+  }
+
+}
+
+

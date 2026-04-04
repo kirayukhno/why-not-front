@@ -1,0 +1,107 @@
+/* 🔹 Overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(2px);
+  z-index: 1000;
+}
+
+/* 🔹 Modal */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  width: calc(100% - 32px); /* mobile padding */
+  max-width: 343px; /* як у Figma mobile */
+
+  background: #FFF2EC;
+  border-radius: 20px;
+  padding: 24px;
+
+  z-index: 1001;
+  text-align: center;
+
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* 🔹 Title */
+.title {
+  font-size: Heading 3;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #101828;
+  margin-bottom: 12px;
+}
+
+/* 🔹 Text */
+.text {
+  font-size: medium;
+  line-height: 1.5;
+  color: #667085;
+  margin-bottom: 24px;
+}
+
+/* 🔹 Buttons container */
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+/* 🔹 Buttons base */
+.cancel,
+.confirm {
+  flex: 1;
+  height: 44px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border: none;
+}
+
+/* 🔹 Cancel (secondary) */
+.cancel {
+  background: #F2F4F7;
+  color: #344054;
+}
+
+.cancel:hover {
+  background: #E4E7EC;
+}
+
+/* 🔹 Confirm (primary) */
+.confirm {
+  background: #CC6534; /* твій бренд */
+  color: #FFFFFF;
+}
+
+.confirm:hover {
+  background: #B95628;
+}
+
+/* 🔹 Tablet */
+@media (min-width: 768px) {
+  .modal {
+    max-width: 400px;
+    padding: 32px;
+  }
+
+  .title {
+    font-size: heading 3;
+  }
+
+  .text {
+    font-size: medium;
+  }
+}
+
+/* 🔹 Desktop */
+@media (min-width: 1440px) {
+  .modal {
+    max-width: 500px;
+  }
+}
