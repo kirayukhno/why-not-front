@@ -6,10 +6,7 @@ import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import toast from 'react-hot-toast';
 import css from './LocationForm.module.css';
-import {
-  createLocation,
-  updateLocation,
-} from '@/lib/api/locations';
+import { createLocation, updateLocation } from '@/lib/api/clientApi';
 
 type LocationFormValues = {
   name: string;

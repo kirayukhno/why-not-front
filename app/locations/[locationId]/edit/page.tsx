@@ -1,4 +1,4 @@
-import { getLocationById } from '@/lib/api/locations';
+import { getLocationById } from '@/lib/api/serverApi';
 import LocationForm from '@/components/LocationForm/LocationForm';
 
 type EditLocationPageProps = {
