@@ -126,7 +126,7 @@ export default function Header() {
           />
         )}
 
-      {/* 🔹 Modal */}
+      {/*  Modal */}
       <LogoutModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
