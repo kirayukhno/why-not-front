@@ -4,6 +4,6 @@ export type ApiError = AxiosError<{ error: string }>;
 
 export const api = axios.create({
   //baseURL: "https://",
-  baseURL: process.env.API_URL,
+  baseURL: process.env.API_URL || process.env.NEXT_PUBLIC_API_URL,
   withCredentials: true,
 });
