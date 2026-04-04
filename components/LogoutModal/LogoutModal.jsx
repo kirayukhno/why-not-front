@@ -4,17 +4,15 @@ import styles from "./LogoutModal.module.css";
 import { useEffect } from "react";
 
 export default function LogoutModal({ isOpen, onClose, onConfirm }) {
-  // 🔒 Закриття по ESC
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === "Escape") onClose();
     };
 
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
+    document.addEventListener("keydown", handleEsc);
+    return () => document.removeEventListener("keydown", handleEsc);
   }, [onClose]);
 
-  // 🔒 Блокування скролу
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "auto";
   }, [isOpen]);
@@ -23,20 +21,18 @@ export default function LogoutModal({ isOpen, onClose, onConfirm }) {
 
   return (
     <>
-      {/* Overlay */}
       <div className={styles.overlay} onClick={onClose}></div>
 
-      {/* Modal */}
       <div className={styles.modal}>
-        <h2 className={styles.title}>Підтвердження виходу</h2>
+        <h2 className={styles.title}>Ви точно хочете вийти?</h2>
 
         <p className={styles.text}>
-          Ви дійсно хочете вийти з акаунту?
+          Ми будемо сумувати за вами!
         </p>
 
         <div className={styles.actions}>
           <button className={styles.cancel} onClick={onClose}>
-            Скасувати
+            Відмінити
           </button>
 
           <button className={styles.confirm} onClick={onConfirm}>
