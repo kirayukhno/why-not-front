@@ -4,7 +4,7 @@ import LocationsGrid from '@/components/LocationsGrid/LocationsGrid';
 import ProfilePlaceholder from '@/components/Profile/ProfilePlaceholder';
 import { notFound } from 'next/navigation';
 import { cookies } from 'next/headers';
-import { userService } from '@/lib/api/user-service';
+import { serverUserService } from '@/lib/api/serverApi';
 
 interface PageProps {
   params: { userId: string };
@@ -16,15 +16,19 @@ export default async function ProfilePage({ params }: PageProps) {
   
   const token = cookieStore.get('token')?.value;
 
-  const [userResult, locationsResult, currentUserResult] = await Promise.all([
-    userService.getUserById(userId),
-    userService.getUserLocations(userId),
-    userService.getCurrentUser() 
-  ]);
+const [userResult, locationsResult, currentUserResult] = await Promise.all([
+  serverUserService.getUserById(userId),
+  serverUserService.getUserLocations(userId),
+  serverUserService.getCurrentUser()
+]);
+  
   if (!userResult || !userResult.data) {
     console.log("User not found for ID:", userId);
     notFound();
   }
+
+    console.log("TOKEN:", token);
+  console.log("CURRENT USER RESULT:", currentUserResult);
 
   const isOwner = currentUserResult?.data?._id === userId;
   console.log("UserId" + userId);
