@@ -1,0 +1,20 @@
+.modal {
+    min-height: 430px;
+}
+
+@media screen and (min-width: 768px) {
+    .modal {
+        min-height: 348px;
+        padding: 64px;
+    }
+}
+
+@media screen and (min-width: 1440px) {
+    .modal {
+        min-height: 400px;
+    }
+    .closeButton {
+        top: 24px;
+        right: 24px;
+    }
+}
