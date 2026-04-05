@@ -39,6 +39,7 @@ export interface LocationsResponse {
   hasNextPage: boolean;
   hasPreviousPage: boolean;
 }
+
 export interface Feedback {
   _id: string;
   id?: string;
@@ -56,3 +57,4 @@ export interface FeedbacksResponse {
   totalFeedbacks: number;
   feedbacks: Feedback[];
 }
+
