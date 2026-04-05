@@ -4,8 +4,7 @@ import { Montserrat } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import "modern-normalize/modern-normalize.css";
-import Header from "../components/Header/Header";
-import Footer from "../components/Footer/Footer";
+
 
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
