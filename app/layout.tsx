@@ -3,6 +3,7 @@ import TanStackProvider from "@/components/TanStackProvider/TanStackProvider";
 import { Montserrat } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
+
 import Header from "@/components/Header/Header";
 
 import "modern-normalize/modern-normalize.css";
@@ -52,5 +53,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-
