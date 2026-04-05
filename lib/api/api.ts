@@ -9,6 +9,3 @@ export const nextServer = axios.create({
 
 
 
-export const logout = async (): Promise<void> => {
-  await nextServer.post('/auth/logout')
-};

@@ -22,6 +22,12 @@ export const login = async (data: LoginData): Promise<User> => {
   const response = await nextServer.post<User>("/auth/login", data);
   return response.data;
 };
+
+
+export const logout = async (): Promise<void> => {
+  await nextServer.post('/auth/logout')
+};
+
 // Feedbacks API
 export const getLocationFeedbacks = async (
   locationId: string,

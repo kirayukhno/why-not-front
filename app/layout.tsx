@@ -3,10 +3,10 @@ import TanStackProvider from "@/components/TanStackProvider/TanStackProvider";
 import { Montserrat } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
+import "modern-normalize/modern-normalize.css";
 
 import Header from "@/components/Header/Header";
-
-import "modern-normalize/modern-normalize.css";
+import Footer from "@/components/Footer/Footer";
 
 const montserrat = Montserrat({
   subsets: ["cyrillic", "latin"],
@@ -45,8 +45,11 @@ export default function RootLayout({
     <html lang="en" data-scroll-behavior="smooth">
       <body className={montserrat.variable}>
         <TanStackProvider>
-          <Header/>
-          {children}
+          <Header />
+          <main>
+            {children}
+          </main>
+          <Footer />
           <Toaster position="top-right" />
         </TanStackProvider>
       </body>
