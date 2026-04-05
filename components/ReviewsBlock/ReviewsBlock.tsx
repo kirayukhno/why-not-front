@@ -4,26 +4,16 @@ import { useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
-
 import "swiper/css";
-
 import StarRating from "../ui/star-rating";
+import type { Feedback } from "@/types/types";
 import styles from "./ReviewsBlock.module.css";
 
-export interface Review {
-  id: string;
-  locationId: string;
-  userName: string;
-  rate: number;
-  description: string;
-  locationType?: string;
+interface FeedbacksBlockProps {
+  reviews: Feedback[];
 }
 
-interface ReviewsBlockProps {
-  reviews: Review[];
-}
-
-function ReviewCard({ review }: { review: Review }) {
+function ReviewCard({ review }: { review: Feedback }) {
   return (
     <div className={styles.card}>
       <StarRating rate={review.rate} size={22} />
@@ -38,7 +28,7 @@ function ReviewCard({ review }: { review: Review }) {
   );
 }
 
-export default function ReviewsBlock({ reviews }: ReviewsBlockProps) {
+export default function ReviewsBlock({ reviews }: FeedbacksBlockProps) {
   const swiperRef = useRef<SwiperType | null>(null);
   const prevRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
