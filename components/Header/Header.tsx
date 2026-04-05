@@ -5,16 +5,14 @@ import Link from "next/link";
 import { useState } from "react";
 import styles from "./Header.module.css";
 import { useAuth } from "@/hooks/useAuth";
-import LogoutModal from "@/components/LogoutModal/LogoutModal";
+import ExitModal from "../ExitModal/ExitModal";
 
 export default function Header() {
-  const { isAuthenticated, user, logout } = useAuth();
-
+  const { isAuthenticated, user} = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   return (
-    
     <header className={styles.header}>
       <div className={styles.container}>
         {/*  Logo */}
@@ -127,16 +125,9 @@ export default function Header() {
           />
         )}
 
-      {/*  Modal */}
-      <LogoutModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        onConfirm={() => {
-          logout();
-          setShowModal(false);
-          setIsOpen(false);
-        }}
-      />
+      {showModal && (
+        <ExitModal onClose={()=>setShowModal(false)}/>
+      )}
     </header>
   );
 }
