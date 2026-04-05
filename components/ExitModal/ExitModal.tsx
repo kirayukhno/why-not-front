@@ -1,14 +1,16 @@
 'use client';
 import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
 import '../../app/globals.css';
+import { useAuth } from '@/hooks/useAuth';
 
 interface ExitModalProps {
     onClose: () => void;
 }
 
 export default function ExitModal({onClose}:ExitModalProps) {
+    const { logout } = useAuth();
     const handleExit = async () => {
-        await fetch('/api/logout', { method: 'POST' });
+        await logout();
     };
 
     return (

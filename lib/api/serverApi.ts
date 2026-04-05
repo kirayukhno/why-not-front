@@ -1,28 +1,12 @@
-// lib/api/serverApi.ts
-import { cookies } from "next/headers";
-import { nextServer } from "./api";
-
-const BASE_URL = "https://relax-map-back.onrender.com/api";
-
-export const getLocationById = async (locationId: string) => {
-  const response = await fetch(`${BASE_URL}/locations/${locationId}`, {
-    cache: "no-store",
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(data.message || "Не вдалося отримати локацію");
-  }
-
-  return data;
-};
+import { nextServer } from './api'; 
+import { cookies } from 'next/headers';
 
 export const serverUserService = {
   getCurrentUser: async () => {
     try {
       const cookieStore = await cookies();
       const cookieHeader = cookieStore.toString();
+
 
       const res = await nextServer.get("/users/current", {
         headers: {
@@ -36,6 +20,7 @@ export const serverUserService = {
     }
   },
 
+
   getUserById: async (userId: string) => {
     try {
       const res = await nextServer.get(`/users/${userId}`);
@@ -46,6 +31,7 @@ export const serverUserService = {
     }
   },
 
+
   getUserLocations: async (userId: string) => {
     try {
       const res = await nextServer.get(`/users/${userId}/locations`);
@@ -55,33 +41,4 @@ export const serverUserService = {
       return { data: { data: [], totalItems: 0 } };
     }
   },
-};
-
-// 🔹 Feedbacks API
-export const getFeedbacks = async () => {
-  try {
-    const res = await nextServer.get("/api/feedback", {
-      params: { perPage: 10 },
-    });
-    console.log("Feedbacks response:", res.data);
-    return (res.data?.feedbacks ?? []).map(
-      (f: { _id: string; [key: string]: unknown }) => ({
-        ...f,
-        id: f._id,
-      }),
-    );
-  } catch (error) {
-    console.error("Server API Error (getFeedbacks):", error);
-    return [];
-  }
-};
-
-export const getLocationFeedbacks = async (locationId: string) => {
-  try {
-    const res = await nextServer.get(`/api/locations/${locationId}/feedbacks`);
-    return res.data?.feedbacks ?? [];
-  } catch (error) {
-    console.error("Server API Error (getLocationFeedbacks):", error);
-    return [];
-  }
 };
