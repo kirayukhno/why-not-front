@@ -6,7 +6,7 @@ import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import toast from 'react-hot-toast';
 import css from './LocationForm.module.css';
-import { createLocation, updateLocation } from '@/lib/api/clientApi';
+import { clientLocationService } from '@/lib/api/clientApi';
 
 type LocationFormValues = {
   name: string;
@@ -36,25 +36,29 @@ const validationSchema = Yup.object({
     .min(3, 'Мінімум 3 символи')
     .max(96, 'Максимум 96 символів')
     .required("Це поле є обов'язковим"),
+
   type: Yup.string()
     .max(64, 'Максимум 64 символи')
     .required("Це поле є обов'язковим"),
+
   region: Yup.string()
     .max(64, 'Максимум 64 символи')
     .required("Це поле є обов'язковим"),
+
   description: Yup.string()
     .min(20, 'Мінімум 20 символів')
     .max(6000, 'Максимум 6000 символів')
     .required("Це поле є обов'язковим"),
-image: Yup.mixed<File>()
-  .nullable()
-  .test(
+
+  image: Yup.mixed<File | null>().test(
     'fileValidation',
     'Фото має бути JPG/PNG і менше 1MB',
-    (value) => {
+    value => {
       if (!value) return true;
+
       const validType = ['image/jpeg', 'image/png'].includes(value.type);
       const validSize = value.size <= 1024 * 1024;
+
       return validType && validSize;
     }
   ),
@@ -76,12 +80,33 @@ const regionOptions = [
   { value: 'Zakarpattia', label: 'Закарпатська область' },
 ];
 
+function PlaceholderIcon() {
+  return (
+    <svg
+      width="160"
+      height="160"
+      viewBox="0 0 160 160"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <rect width="160" height="160" rx="16" fill="#C9C9C9" />
+      <circle cx="61" cy="50" r="13" fill="#E2E2E2" />
+      <path
+        d="M102.585 61.4888C101.005 59.6157 98.113 59.6713 96.606 61.6036L78.1683 85.2506C76.5408 87.3382 73.3494 87.1849 71.9301 84.9507L65.5868 74.9666C64.0417 72.5336 60.4966 72.5514 58.9761 75L35.3325 113.065C33.7265 115.651 35.5864 119 38.6321 119H118.731C121.849 119 123.688 115.503 121.938 112.923L102.585 61.4888Z"
+        fill="#E2E2E2"
+      />
+    </svg>
+  );
+}
+
 export default function LocationForm({
   mode = 'create',
   locationId,
   initialData,
 }: LocationFormProps) {
   const router = useRouter();
+
   const [preview, setPreview] = useState<string | null>(
     initialData?.image || null
   );
@@ -112,8 +137,8 @@ export default function LocationForm({
 
       const data =
         mode === 'edit' && locationId
-          ? await updateLocation(locationId, formData)
-          : await createLocation(formData);
+          ? await clientLocationService.updateLocation(locationId, formData)
+          : await clientLocationService.createLocation(formData);
 
       toast.success(
         mode === 'edit'
@@ -122,10 +147,8 @@ export default function LocationForm({
       );
 
       router.push(`/locations/${data.data._id}`);
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : 'Сталася помилка';
-      toast.error(message);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || 'Сталася помилка');
     } finally {
       setSubmitting(false);
     }
@@ -142,7 +165,7 @@ export default function LocationForm({
         <Form className={css.form}>
           <div className={css.fieldGroup}>
             <label className={css.label} htmlFor="image">
-              Фото локації
+              Обкладинка
             </label>
 
             <div className={css.previewWrapper}>
@@ -154,10 +177,14 @@ export default function LocationForm({
                 />
               ) : (
                 <div className={css.placeholder}>
-                  <span>Оберіть зображення</span>
+                  <PlaceholderIcon />
                 </div>
               )}
             </div>
+
+            <label className={css.uploadBtn} htmlFor="image">
+              Завантажити фото
+            </label>
 
             <input
               id="image"
@@ -165,13 +192,15 @@ export default function LocationForm({
               type="file"
               accept="image/png, image/jpeg"
               className={css.fileInput}
-              onChange={(event) => {
+              onChange={event => {
                 const file = event.currentTarget.files?.[0] || null;
                 setFieldValue('image', file);
 
                 if (file) {
                   const objectUrl = URL.createObjectURL(file);
                   setPreview(objectUrl);
+                } else {
+                  setPreview(initialData?.image || null);
                 }
               }}
             />
@@ -185,13 +214,15 @@ export default function LocationForm({
             <label className={css.label} htmlFor="name">
               Назва місця
             </label>
+
             <Field
               id="name"
               name="name"
               type="text"
-              placeholder="Введіть назву"
+              placeholder="Введіть назву місця"
               className={css.input}
             />
+
             <ErrorMessage name="name" component="p" className={css.error} />
           </div>
 
@@ -199,13 +230,15 @@ export default function LocationForm({
             <label className={css.label} htmlFor="type">
               Тип місця
             </label>
+
             <Field as="select" id="type" name="type" className={css.select}>
-              {typeOptions.map((option) => (
+              {typeOptions.map(option => (
                 <option key={option.value || 'empty-type'} value={option.value}>
                   {option.label}
                 </option>
               ))}
             </Field>
+
             <ErrorMessage name="type" component="p" className={css.error} />
           </div>
 
@@ -213,13 +246,14 @@ export default function LocationForm({
             <label className={css.label} htmlFor="region">
               Регіон
             </label>
+
             <Field
               as="select"
               id="region"
               name="region"
               className={css.select}
             >
-              {regionOptions.map((option) => (
+              {regionOptions.map(option => (
                 <option
                   key={option.value || 'empty-region'}
                   value={option.value}
@@ -228,6 +262,7 @@ export default function LocationForm({
                 </option>
               ))}
             </Field>
+
             <ErrorMessage name="region" component="p" className={css.error} />
           </div>
 
@@ -235,13 +270,15 @@ export default function LocationForm({
             <label className={css.label} htmlFor="description">
               Детальний опис
             </label>
+
             <Field
               as="textarea"
               id="description"
               name="description"
-              placeholder="Введіть опис місця"
+              placeholder="Детальний опис локації"
               className={css.textarea}
             />
+
             <ErrorMessage
               name="description"
               component="p"
@@ -252,7 +289,7 @@ export default function LocationForm({
           <div className={css.actions}>
             <button
               type="submit"
-              className="primary-btn"
+              className={css.submitBtn}
               disabled={isSubmitting}
             >
               {isSubmitting
@@ -264,7 +301,7 @@ export default function LocationForm({
 
             <button
               type="button"
-              className="secondary-btn"
+              className={css.cancelBtn}
               onClick={() => {
                 resetForm();
                 setPreview(initialData?.image || null);
