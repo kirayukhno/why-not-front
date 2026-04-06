@@ -2,6 +2,7 @@
 
 import { nextServer } from "./api";
 import type { User, Feedback, FeedbacksResponse } from "@/types/types";
+import { AxiosError } from "axios";
 
 // Auth API
 export interface RegisterData {
@@ -11,21 +12,36 @@ export interface RegisterData {
 }
 
 export type LoginData = {
-email: string;
-password: string;
+  email: string;
+  password: string;
 };
-
 
 
 export const register = async (data: RegisterData): Promise<User> => {
-  const response = await nextServer.post<User>("/auth/register", data);
-  return response.data;
+  try {
+    const response = await nextServer.post<User>("/auth/register", data);
+    return response.data;
+  } catch (error) {
+    const err = error as AxiosError<{ error?: string }>;
+
+    throw new Error(err.response?.data?.error || "Ошибка регистрации");
+  }
 };
 
-export const login = async (data: LoginData): Promise<User> => {
-  const response = await nextServer.post<User>("/auth/login", data);
-  return response.data;
-};
+export async function login(data: LoginData) {
+  try {
+    const res = await nextServer.post('/auth/login', data);
+    return res.data;
+  } catch (error: unknown) {
+    console.error('Client API Error (login):', error);
+
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+
+    throw new Error('Помилка входу');
+  }
+}
 
 
 // Feedbacks API
@@ -103,17 +119,3 @@ export const clientLocationService = {
   },
 };
 
-export type LoginData = {
-  email: string;
-  password: string;
-};
-
-export async function login(data: LoginData) {
-  try {
-    const res = await nextServer.post('/auth/login', data);
-    return res.data;
-  } catch (error: any) {
-    console.error('Client API Error (login):', error);
-    throw new Error(error?.response?.data?.error || 'Помилка входу');
-  }
-}
