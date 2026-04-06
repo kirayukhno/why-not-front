@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { nextServer } from "../api";
 import { isAxiosError } from "axios";
+import { api} from '../api';
 
 export async function GET() {
   try {
-    const apiRes = await nextServer.get("/api/feedback");
+    const apiRes = await api.get("/api/feedback");
     return NextResponse.json(apiRes.data, { status: apiRes.status });
   } catch (error) {
     if (isAxiosError(error)) {

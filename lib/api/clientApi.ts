@@ -9,10 +9,13 @@ export interface RegisterData {
   password: string;
 }
 
-export interface LoginData {
-  email: string;
-  password: string;
-}
+export type LoginData = {
+email: string;
+password: string;
+};
+
+
+
 export const register = async (data: RegisterData): Promise<User> => {
   const response = await nextServer.post<User>("/auth/register", data);
   return response.data;
@@ -23,10 +26,6 @@ export const login = async (data: LoginData): Promise<User> => {
   return response.data;
 };
 
-
-export const logout = async (): Promise<void> => {
-  await nextServer.post('/auth/logout')
-};
 
 // Feedbacks API
 export const getLocationFeedbacks = async (
