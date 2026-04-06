@@ -11,7 +11,7 @@ export default function Header() {
   const { isAuthenticated, user} = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
-
+//console.log("Header user:", user);
   return (
     <header className={styles.header}>
       <div className={styles.container}>
@@ -33,14 +33,14 @@ export default function Header() {
           </div>
           {isAuthenticated ? (
             <>
-              <Link href={`/profile/${user?.data?._id}`} className={styles.linkprofile}>
+              <Link href={`/profile/${user?.id}`} className={styles.linkprofile}>
                 Мій профіль
               </Link>
               <Link href="/locations/add" className={styles.sharelocation}>
                 Поділитись локацією
               </Link>
               <div className={styles.userBlock}>
-                <span className={styles.userName}>{user?.data?.name || "User"}</span>
+                <span className={styles.userName}>{user?.name || "User"}</span>
                 <a className={styles.logout} onClick={() => setShowModal(true)}>
                   <Image
                     src="/img/logout.svg"
