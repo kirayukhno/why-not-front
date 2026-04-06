@@ -15,8 +15,8 @@ export default function AuthPromptModal({ onClose }: AuthPromptModalProps) {
             <h2 className={`${css.message} ${styles.message}`}>Помилка під час додавання відгуку</h2>
             <p className={`${css.details} ${styles.details}`}>Щоб залишити відгук вам треба увійти, якщо ще немає облікового запису зареєструйтесь</p>
             <div className={css.options}>
-                <Link href='/login' className='secondary-btn'>Увійти</Link>
-                <Link href='/register' className='primary-btn'>Зареєструватись</Link>
+                <Link href='/sign-in' className='secondary-btn'>Увійти</Link>
+                <Link href='/sign-up' className='primary-btn'>Зареєструватись</Link>
             </div>
         </Modal>
     );
