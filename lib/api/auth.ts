@@ -1,5 +1,9 @@
-import { nextServer } from "./api";
-import { User } from "@/types/types";
+
+
+// lib/api/auth.ts
+
+import axios from "axios";
+
 
 const API_URL = `${process.env.NEXT_PUBLIC_API_URL}`;
 //console.log("API_URL:", API_URL);  
@@ -12,3 +16,4 @@ export const getCurrentUser = async (): Promise<User | null> => {
   return res.data;
 
 };
+
