@@ -5,7 +5,7 @@ export default function CreateLocationPage() {
     <section className="section">
       <div className="container">
         <h1>Додавання нового місця</h1>
-        <LocationForm />
+        <LocationForm mode="create" />
       </div>
     </section>
   );

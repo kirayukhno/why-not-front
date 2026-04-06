@@ -1,44 +1,24 @@
-import { nextServer } from './api'; 
+import { nextServer } from './api';
 import { cookies } from 'next/headers';
 
-export const serverUserService = {
-  getCurrentUser: async () => {
-    try {
-      const cookieStore = await cookies();
-      const cookieHeader = cookieStore.toString();
+export async function getFeedbacks() {
+  try {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get('accessToken')?.value;
 
+    const headers: Record<string, string> = {};
 
-      const res = await nextServer.get("/users/current", {
-        headers: {
-          Cookie: cookieHeader,
-        },
-      });
-      return res.data;
-    } catch (error) {
-      console.error("Server API Error (getCurrentUser):", error);
-      return null;
+    if (accessToken) {
+      headers.Authorization = `Bearer ${accessToken}`;
     }
-  },
 
+    const res = await nextServer.get('/feedbacks', {
+      headers,
+    });
 
-  getUserById: async (userId: string) => {
-    try {
-      const res = await nextServer.get(`/users/${userId}`);
-      return res.data;
-    } catch (error) {
-      console.error(`Server API Error (getUserById ${userId}):`, error);
-      return null;
-    }
-  },
-
-
-  getUserLocations: async (userId: string) => {
-    try {
-      const res = await nextServer.get(`/users/${userId}/locations`);
-      return res.data;
-    } catch (error) {
-      console.error(`Server API Error (getUserLocations):`, error);
-      return { data: { data: [], totalItems: 0 } };
-    }
-  },
-};
+    return res.data;
+  } catch (error) {
+    console.error('Server API Error (getFeedbacks):', error);
+    return { data: [] };
+  }
+}
