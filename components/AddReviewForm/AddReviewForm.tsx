@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import css from './AddReviewForm.module.css';
+import { useAuth } from '@/hooks/useAuth';
 
 interface AddReviewFormProps {
   locationId: string;
@@ -12,7 +13,6 @@ interface AddReviewFormProps {
 }
 
 interface ReviewFormValues {
-  userName: string;
   description: string;
   rate: number;
 }
@@ -39,22 +39,17 @@ interface StarIconProps {
 }
 
 const initialValues: ReviewFormValues = {
-  userName: '',
   description: '',
   rate: 0,
 };
 
 const reviewSchema = Yup.object({
-  userName: Yup.string()
-    .trim()
-    .min(2, "Мінімум 2 символи")
-    .max(32, "Максимум 32 символи")
-    .required("Введіть ім'я"),
   description: Yup.string()
     .trim()
     .min(1, 'Мінімум 1 символ')
     .max(200, 'Максимум 200 символів')
     .required('Введіть відгук'),
+
   rate: Yup.number()
     .min(1, 'Оберіть рейтинг')
     .max(5, 'Максимум 5 зірок')
@@ -109,33 +104,35 @@ export default function AddReviewForm({
 }: AddReviewFormProps) {
   const [serverError, setServerError] = useState('');
   const [hoveredRating, setHoveredRating] = useState(0);
+  const { user } = useAuth();
 
   const handleSubmit = async (
-    values: ReviewFormValues,
-    actions: FormikHelpers<ReviewFormValues>
+  values: ReviewFormValues,
+  actions: FormikHelpers<ReviewFormValues>
   ): Promise<void> => {
-    setServerError('');
+    if (!user) return;
+  setServerError('');
 
-    try {
-      await createReview({
-        locationId,
-        userName: values.userName.trim(),
-        description: values.description.trim(),
-        rate: values.rate,
-      });
+  try {
+    await createReview({
+      locationId,
+      userName: user.name,
+      description: values.description.trim(),
+      rate: values.rate,
+    });
 
-      actions.resetForm();
-      onSuccess();
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        setServerError(error.message);
-      } else {
-        setServerError('Сталася помилка. Спробуйте ще раз.');
-      }
-    } finally {
-      actions.setSubmitting(false);
+    actions.resetForm();
+    onSuccess();
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      setServerError(error.message);
+    } else {
+      setServerError('Сталася помилка. Спробуйте ще раз.');
     }
-  };
+  } finally {
+    actions.setSubmitting(false);
+  }
+};
 
   return (
     <Formik<ReviewFormValues>
@@ -153,7 +150,6 @@ export default function AddReviewForm({
             <Field
               as="textarea"
               id="description"
-              name="description"
               className={`${css.textarea} ${
                 touched.description && errors.description ? css.textareaError : ''
               }`}
