@@ -1,23 +1,53 @@
-// lib/api/serverApi.ts
-import { cookies } from "next/headers";
-import { nextServer } from "./api";
 
-const BASE_URL = "https://relax-map-back.onrender.com/api";
+import { nextServer } from './api';
+import { cookies } from 'next/headers';
+import { Feedback, FeedbacksResponse } from "@/types/types";
 
+export async function getFeedbacks() {
+  try {
+    const cookieStore = await cookies();
+    const accessToken = cookieStore.get('accessToken')?.value;
+    const headers: Record<string, string> = {};
 
-export const getLocationById = async (locationId: string) => {
-  const response = await fetch(`${BASE_URL}/locations/${locationId}`, {
-    cache: "no-store",
-  });
+    if (accessToken) {
+      headers.Authorization = `Bearer ${accessToken}`;
+    }
 
-  const data = await response.json();
+    const res = await nextServer.get('/feedbacks', {
+      headers,
+    });
 
-  if (!response.ok) {
-    throw new Error(data.message || "Не вдалося отримати локацію");
+    return res.data;
+  } catch (error) {
+    console.error('Server API Error (getFeedbacks):', error);
+    return { data: [] };
   }
+}
 
-  return data;
+// : Feedbacks API
+// export const getFeedbacks = async (): Promise<Feedback[]> => {
+//   const res = await nextServer.get<FeedbacksResponse>("/api/feedback", {
+//     params: { perPage: 10 },
+//   });
+//   return (res.data?.feedbacks ?? []).map((f) => ({
+//     ...f,
+//     id: f._id,
+//   }));
+// };
+
+export const getLocationFeedbacks = async (
+  locationId: string,
+): Promise<Feedback[]> => {
+  const res = await nextServer.get<FeedbacksResponse>(
+    `/api/locations/${locationId}/feedbacks`,
+  );
+  return (res.data?.feedbacks ?? []).map((f) => ({
+    ...f,
+    id: f._id,
+  }));
 };
+
+
 
 export const serverUserService = {
   getCurrentUser: async () => {
@@ -25,35 +55,4 @@ export const serverUserService = {
       const cookieStore = await cookies();
       const cookieHeader = cookieStore.toString();
 
-      const res = await nextServer.get("/users/current", {
-        headers: {
-          Cookie: cookieHeader,
-        },
-      });
-      return res.data;
-    } catch (error) {
-      console.error("Server API Error (getCurrentUser):", error);
-      return null;
-    }
-  },
 
-  getUserById: async (userId: string) => {
-    try {
-      const res = await nextServer.get(`/users/${userId}`);
-      return res.data;
-    } catch (error) {
-      console.error(`Server API Error (getUserById ${userId}):`, error);
-      return null;
-    }
-  },
-
-  getUserLocations: async (userId: string) => {
-    try {
-      const res = await nextServer.get(`/users/${userId}/locations`);
-      return res.data;
-    } catch (error) {
-      console.error(`Server API Error (getUserLocations):`, error);
-      return { data: { data: [], totalItems: 0 } };
-    }
-  },
-};

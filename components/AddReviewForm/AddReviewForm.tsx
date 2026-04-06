@@ -6,24 +6,30 @@ import * as Yup from 'yup';
 import css from './AddReviewForm.module.css';
 
 interface AddReviewFormProps {
-  bookingId: string;
+  locationId: string;
   onCancel: () => void;
   onSuccess: () => void;
 }
 
 interface ReviewFormValues {
-  comment: string;
-  rating: number;
+  userName: string;
+  description: string;
+  rate: number;
 }
 
 interface CreateReviewPayload {
-  bookingId: string;
-  comment: string;
-  rating: number;
+  locationId: string;
+  userName: string;
+  description: string;
+  rate: number;
 }
 
 interface CreateReviewResponse {
-  message: string;
+  message?: string;
+  _id?: string;
+  rate?: number;
+  description?: string;
+  userName?: string;
 }
 
 type StarVariant = 'empty' | 'selected';
@@ -33,17 +39,23 @@ interface StarIconProps {
 }
 
 const initialValues: ReviewFormValues = {
-  comment: '',
-  rating: 0,
+  userName: '',
+  description: '',
+  rate: 0,
 };
 
 const reviewSchema = Yup.object({
-  comment: Yup.string()
+  userName: Yup.string()
     .trim()
-    .min(3, 'Мінімум 3 символів')
-    .max(500, 'Максимум 500 символів')
+    .min(2, "Мінімум 2 символи")
+    .max(32, "Максимум 32 символи")
+    .required("Введіть ім'я"),
+  description: Yup.string()
+    .trim()
+    .min(1, 'Мінімум 1 символ')
+    .max(200, 'Максимум 200 символів')
     .required('Введіть відгук'),
-  rating: Yup.number()
+  rate: Yup.number()
     .min(1, 'Оберіть рейтинг')
     .max(5, 'Максимум 5 зірок')
     .required('Оберіть рейтинг'),
@@ -60,8 +72,8 @@ function StarIcon({ variant }: StarIconProps) {
 
   return (
     <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <path d="M11.4333 22.5664L16 19.0998L20.5666 22.5664L18.7333 16.7998L22.9333 14.0664H17.9L16 8.29977L14.1 14.0664H9.06663L13.2666 16.7998L11.4333 22.5664ZM16.008 21.8844L10.369 26.1808C10.1423 26.3523 9.91297 26.427 9.68097 26.4048C9.44919 26.3825 9.23375 26.3079 9.03463 26.1808C8.83575 26.0539 8.69341 25.8813 8.60763 25.6631C8.52186 25.4451 8.51497 25.2005 8.58697 24.9294L10.739 17.9221L5.20797 13.9431C4.9813 13.7887 4.83497 13.5939 4.76897 13.3588C4.70274 13.1239 4.7083 12.9015 4.78563 12.6918C4.86274 12.4875 4.98841 12.3039 5.16263 12.1408C5.33686 11.9777 5.56741 11.8961 5.8543 11.8961H12.7123L14.9056 4.58877C14.9776 4.31254 15.1201 4.10532 15.333 3.9671C15.5459 3.82888 15.7682 3.75977 16 3.75977C16.2317 3.75977 16.4541 3.82888 16.667 3.9671C16.8799 4.10532 17.025 4.31254 17.1023 4.58877L19.2876 11.8961H26.1536C26.4352 11.8961 26.6631 11.9777 26.8373 12.1408C27.0115 12.3039 27.1372 12.4875 27.2143 12.6918C27.2916 12.9015 27.2972 13.1239 27.231 13.3588C27.165 13.5939 27.0186 13.7887 26.792 13.9431L21.261 17.9221L23.413 24.9214C23.485 25.1979 23.4781 25.4438 23.3923 25.6591C23.3065 25.8747 23.1642 26.046 22.9653 26.1731C22.7662 26.3053 22.552 26.3825 22.3226 26.4048C22.0935 26.427 21.8656 26.3498 21.639 26.1731L16.008 21.8844Z" fill="black" />
-</svg>
+      <path d="M11.4333 22.5664L16 19.0998L20.5666 22.5664L18.7333 16.7998L22.9333 14.0664H17.9L16 8.29977L14.1 14.0664H9.06663L13.2666 16.7998L11.4333 22.5664ZM16.008 21.8844L10.369 26.1808C10.1423 26.3523 9.91297 26.427 9.68097 26.4048C9.44919 26.3825 9.23375 26.3079 9.03463 26.1808C8.83575 26.0539 8.69341 25.8813 8.60763 25.6631C8.52186 25.4451 8.51497 25.2005 8.58697 24.9294L10.739 17.9221L5.20797 13.9431C4.9813 13.7887 4.83497 13.5939 4.76897 13.3588C4.70274 13.1239 4.7083 12.9015 4.78563 12.6918C4.86274 12.4875 4.98841 12.3039 5.16263 12.1408C5.33686 11.9777 5.56741 11.8961 5.8543 11.8961H12.7123L14.9056 4.58877C14.9776 4.31254 15.1201 4.10532 15.333 3.9671C15.5459 3.82888 15.7682 3.75977 16 3.75977C16.2317 3.75977 16.4541 3.82888 16.667 3.9671C16.8799 4.10532 17.025 4.31254 17.1023 4.58877L19.2876 11.8961H26.1536C26.4352 11.8961 26.6631 11.9777 26.8373 12.1408C27.0115 12.3039 27.1372 12.4875 27.2143 12.6918C27.2916 12.9015 27.2972 13.1239 27.231 13.3588C27.165 13.5939 27.0186 13.7887 26.792 13.9431L21.261 17.9221L23.413 24.9214C23.485 25.1979 23.4781 25.4438 23.3923 25.6591C23.3065 25.8747 23.1642 26.046 22.9653 26.1731C22.7662 26.3053 22.552 26.3825 22.3226 26.4048C22.0935 26.427 21.8656 26.3498 21.639 26.1731L16.008 21.8844Z" fill="black" />
+    </svg>
   );
 }
 
@@ -91,12 +103,12 @@ async function createReview(
 }
 
 export default function AddReviewForm({
-  bookingId,
+  locationId,
   onCancel,
   onSuccess,
 }: AddReviewFormProps) {
-  const [serverError, setServerError] = useState<string>('');
-  const [hoveredRating, setHoveredRating] = useState<number>(0);
+  const [serverError, setServerError] = useState('');
+  const [hoveredRating, setHoveredRating] = useState(0);
 
   const handleSubmit = async (
     values: ReviewFormValues,
@@ -106,9 +118,10 @@ export default function AddReviewForm({
 
     try {
       await createReview({
-        bookingId,
-        comment: values.comment.trim(),
-        rating: values.rating,
+        locationId,
+        userName: values.userName.trim(),
+        description: values.description.trim(),
+        rate: values.rate,
       });
 
       actions.resetForm();
@@ -139,10 +152,10 @@ export default function AddReviewForm({
 
             <Field
               as="textarea"
-              id="comment"
-              name="comment"
+              id="description"
+              name="description"
               className={`${css.textarea} ${
-                touched.comment && errors.comment ? css.textareaError : ''
+                touched.description && errors.description ? css.textareaError : ''
               }`}
               placeholder="Напишіть ваш відгук"
             />
@@ -164,7 +177,7 @@ export default function AddReviewForm({
                 >
                   <StarIcon
                     variant={
-                      (hoveredRating || values.rating) >= star
+                      (hoveredRating || values.rate) >= star
                         ? 'selected'
                         : 'empty'
                     }

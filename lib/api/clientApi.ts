@@ -1,88 +1,51 @@
-import axios from "axios";
+
+
 import { nextServer } from "./api";
-import { parse } from "cookie";
+import type { User, Feedback, FeedbacksResponse } from "@/types/types";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL + "/api";
-
-export const clientApi = axios.create({
-  baseURL,
-  withCredentials: true,
-});
-
-export const nextClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_BASE_URL + "/api",
-  withCredentials: true,
-});
-
-export interface FetchLocationsParams {
-  page?: number;
-  limit?: number;
-  search?: string;
-  region?: string;
-  type?: string;
-  sort?: string;
+// Auth API
+export interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
 }
 
-export const fetchLocations = async (params: FetchLocationsParams) => {
-  const response = await clientApi.get("/locations", { params });
-  return response.data.data;
+export type LoginData = {
+email: string;
+password: string;
 };
 
-export const fetchRegions = async () => {
-  const response = await clientApi.get("/categories/regions");
-  return response.data.data;
+
+
+export const register = async (data: RegisterData): Promise<User> => {
+  const response = await nextServer.post<User>("/auth/register", data);
+  return response.data;
 };
 
-export const fetchLocationTypes = async () => {
-  const response = await clientApi.get("/categories/types");
-  return response.data.data;
+export const login = async (data: LoginData): Promise<User> => {
+  const response = await nextServer.post<User>("/auth/login", data);
+  return response.data;
 };
 
-// 🔹 Location CRUD (create/update) с fetch
-export const createLocation = async (formData: FormData) => {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-  const response = await fetch("/api/locations", {
-    method: "POST",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-    body: formData,
-  });
-
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message || "Не вдалося створити локацію");
-  }
-
-  return data;
+// Feedbacks API
+export const getLocationFeedbacks = async (
+  locationId: string,
+): Promise<Feedback[]> => {
+  const res = await nextServer.get<FeedbacksResponse>(
+    `/api/locations/${locationId}/feedbacks`,
+  );
+  return res.data?.feedbacks ?? [];
 };
 
-export const updateLocation = async (locationId: string, formData: FormData) => {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
-  const response = await fetch(`/api/locations/${locationId}`, {
-    method: "PATCH",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-    body: formData,
-  });
-
-  const data = await response.json();
-  if (!response.ok) {
-    throw new Error(data.message || "Не вдалося оновити локацію");
-  }
-
-  return data;
-};
-
-// 🔹 User API
 export const clientUserService = {
   getCurrentUser: async () => {
     try {
-      const res = await nextServer.get("/users/current");
+      const res = await nextServer.get('/users/current');
       return res.data;
     } catch (error) {
-      console.error("Client API Error (getCurrentUser):", error);
+      console.error('Client API Error (getCurrentUser):', error);
       return null;
     }
   },
@@ -102,42 +65,55 @@ export const clientUserService = {
       const res = await nextServer.get(`/users/${userId}/locations`);
       return res.data;
     } catch (error) {
-      console.error(`Client API Error (getUserLocations):`, error);
+      console.error('Client API Error (getUserLocations):', error);
       return { data: { data: [], totalItems: 0 } };
     }
   },
 };
 
-// 🔹 Auth API
-export interface RegisterData {
-  name: string;
-  email: string;
-  password: string;
-}
+export const clientLocationService = {
+  createLocation: async (formData: FormData) => {
+    try {
+      const res = await nextServer.post('/locations', formData);
+      return res.data;
+    } catch (error) {
+      console.error('Client API Error (createLocation):', error);
+      throw error;
+    }
+  },
 
-export interface LoginData {
-  email: string;
-  password: string;
-}
+  updateLocation: async (locationId: string, formData: FormData) => {
+    try {
+      const res = await nextServer.patch(`/locations/${locationId}`, formData);
+      return res.data;
+    } catch (error) {
+      console.error(`Client API Error (updateLocation ${locationId}):`, error);
+      throw error;
+    }
+  },
 
-export const register = async (data: RegisterData) => {
-  try {
-    const res = await nextClient.post("/auth/register", data);
-    return res.data;
-  } catch (error) {
-    console.error("Client API Error (register):", error);
-    throw error;
-  }
+  getLocationById: async (locationId: string) => {
+    try {
+      const res = await nextServer.get(`/locations/${locationId}`);
+      return res.data;
+    } catch (error) {
+      console.error(`Client API Error (getLocationById ${locationId}):`, error);
+      throw error;
+    }
+  },
 };
 
-export const login = async (data: LoginData) => {
-  try {
-    const res = await nextClient.post("/auth/login", data);
-    return res.data;
-  } catch (error) {
-    console.error("Client API Error (login):", error);
-    throw error;
-  }
+export type LoginData = {
+  email: string;
+  password: string;
 };
 
-export default clientApi;
+export async function login(data: LoginData) {
+  try {
+    const res = await nextServer.post('/auth/login', data);
+    return res.data;
+  } catch (error: any) {
+    console.error('Client API Error (login):', error);
+    throw new Error(error?.response?.data?.error || 'Помилка входу');
+  }
+}

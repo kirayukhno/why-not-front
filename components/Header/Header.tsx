@@ -5,40 +5,14 @@ import Link from "next/link";
 import { useState } from "react";
 import styles from "./Header.module.css";
 import { useAuth } from "@/hooks/useAuth";
-
-type LogoutModalProps = {
-  isOpen: boolean;
-  onClose: () => void;
-  onConfirm: () => void;
-};
-
-function LogoutModal({ isOpen, onClose, onConfirm }: LogoutModalProps) {
-  if (!isOpen) return null;
-
-  return (
-    <div className={styles.overlay}>
-      <div>
-        <p>Ви дійсно хочете вийти?</p>
-        <button type="button" onClick={onConfirm}>
-          Так
-        </button>
-        <button type="button" onClick={onClose}>
-          Ні
-        </button>
-      </div>
-    </div>
-  );
-}
+import ExitModal from "../ExitModal/ExitModal";
 
 export default function Header() {
-  const { isAuthenticated, user, logout } = useAuth();
-
+  const { isAuthenticated, user} = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const toggleMenu = () => setIsOpen(!isOpen);
-
+//console.log("Header user:", user);
   return (
-    
     <header className={styles.header}>
       <div className={styles.container}>
         {/*  Logo */}
@@ -59,20 +33,22 @@ export default function Header() {
           </div>
           {isAuthenticated ? (
             <>
-              <nav className={styles.nav}>
-                <Link href="/locations" className={styles.link}>
-                  Місця відпочинку
-                </Link>
-                <Link href="/profile" className={styles.link}>
-                  Мій Профіль
-                </Link>
-                <Link href="/locations/add" className={styles.link}>
-                  Поділитись локацією
-                </Link>
-                <span>{user?.name}</span>
-              </nav>
-              <div className={styles.actions}>
-                <button onClick={() => setShowModal(true)}>Вихід</button>
+              <Link href={`/profile/${user?.id}`} className={styles.linkprofile}>
+                Мій профіль
+              </Link>
+              <Link href="/locations/add" className={styles.sharelocation}>
+                Поділитись локацією
+              </Link>
+              <div className={styles.userBlock}>
+                <span className={styles.userName}>{user?.name || "User"}</span>
+                <a className={styles.logout} onClick={() => setShowModal(true)}>
+                  <Image
+                    src="/img/logout.svg"
+                    alt="Logout"
+                    width={24}
+                    height={24}
+                  />
+                </a>
               </div>
             </>
           ) : (
@@ -85,52 +61,58 @@ export default function Header() {
               </Link>
             </>
           )}
-          {/* Burger */}
-          <button className={styles.burger} onClick={toggleMenu}>
-            <span className={isOpen ? styles.lineActive : ""}></span>
-            <span className={isOpen ? styles.lineActive : ""}></span>
-            <span className={isOpen ? styles.lineActive : ""}></span>
-          </button>
-          {/* Mobile menu */}
-          {isAuthenticated ? (
+        </nav>
+
+        {/*  Burger menu */}
+        <button
+          className={`${styles.burger} ${isOpen ? styles.active : ""}`}
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+      {/*  Mobile menu */}
+      <div className={`${styles.mobileMenu} ${isOpen ? styles.open : ""}`}>
+        <nav className={styles.mobileNav}>
+          <Link href="/" onClick={() => setIsOpen(false)}>
+            Головна
+          </Link>
+          <Link href="..\LocationGallery" onClick={() => setIsOpen(false)}>
+            Місця відпочинку
+          </Link>
+
+          {isAuthenticated && (
             <>
-              <div
-                className={`${styles.mobileMenu} ${isOpen ? styles.open : ""}`}
+              <Link href="/profile" onClick={() => setIsOpen(false)}>
+                Профіль
+              </Link>
+              <Link href="/LocationDescription" className={styles.register} onClick={() => setIsOpen(false)}>
+                Опублікувати статтю
+              </Link>
+
+              <button
+                className={styles.logoutMobile}
+                onClick={() => {
+                  setShowModal(true);
+                  setIsOpen(false);
+                }}
               >
-                <nav className={styles.mobileNav}>
-                  <Link href="/locations" onClick={toggleMenu}>
-                    Місця відпочинку
-                  </Link>
-                  <Link href="/profile" onClick={toggleMenu}>
-                    Мій Профіль
-                  </Link>
-                  <Link href="/locations/add" onClick={toggleMenu}>
-                    Поділитись локацією
-                  </Link>
-                  <button onClick={() => setShowModal(true)}>Вихід</button>
-                </nav>
-              </div>
+                Вийти
+              </button>
             </>
-          ) : (
+          )}
+
+          {!isAuthenticated && (
             <>
-              <div
-                className={`${styles.mobileMenu} ${isOpen ? styles.open : ""}`}
-              >
-                <nav className={styles.mobileNav}>
-                  <Link href="/" onClick={toggleMenu}>
-                    Головна
-                  </Link>
-                  <Link href="/locations" onClick={toggleMenu}>
-                    Місця відпочинку
-                  </Link>
-                  <Link href="/sign-in" onClick={toggleMenu}>
-                    Вхід
-                  </Link>
-                  <Link href="/sign-up" onClick={toggleMenu}>
-                    Реєстрація
-                  </Link>
-                </nav>
-              </div>
+              <Link href="/sign-in" className={styles.login} onClick={() => setIsOpen(false)}>
+                Вхід
+              </Link>
+              <Link href="/sign-up" className={styles.register} onClick={() => setIsOpen(false)}>
+                Реєстрація
+              </Link>
             </>
           )}
         </nav>
@@ -143,16 +125,9 @@ export default function Header() {
           />
         )}
 
-      {/* 🔹 Modal */}
-      <LogoutModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        onConfirm={() => {
-          logout();
-          setShowModal(false);
-          setIsOpen(false);
-        }}
-      />
+      {showModal && (
+        <ExitModal onClose={()=>setShowModal(false)}/>
+      )}
     </header>
   );
 }

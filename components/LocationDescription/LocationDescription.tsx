@@ -6,8 +6,10 @@ type LocationDescriptionProps = {
 
 export const LocationDescription = ({ text }: LocationDescriptionProps) => {
   return (
-    <div className={styles.locationDescription}>
-      <p className={styles.text}>{text}</p>
+    <div className="container">
+      <div className={styles.locationDescription}>
+        <p className={styles.text}>{text}</p>
+      </div>
     </div>
   );
 };
