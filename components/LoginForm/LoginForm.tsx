@@ -35,7 +35,7 @@ export default function LoginForm() {
   ) => {
     try {
       const response = await login(values);
-      
+      console.log('Login response:', response);
       const userId = response.userId || response.user?._id || response.user?.id;
 
       if (!userId) {
@@ -50,7 +50,9 @@ export default function LoginForm() {
       }
       
       router.refresh();
-      
+      //   window.location.href = redirectTo !== '/' 
+      // ? redirectTo 
+      // : `/profile/${userId}`;
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Помилка входу");
     } finally {

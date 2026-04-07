@@ -66,13 +66,16 @@ const [userResult, locationsResult, currentUserResult] = await Promise.all([
   serverUserService.getUserLocations(userId),
   serverUserService.getCurrentUser()
   ]);
+ console.log("userResult:", JSON.stringify(userResult, null, 2));
  
- 
-  if (!userResult || !userResult.data) {
-    console.log("User not found for ID:", userId);
-    notFound();
-  }
-
+  // if (!userResult?.data) {
+  //   console.log("userResult.data:", userResult?.data);
+  //   notFound();
+  // }
+if (!userResult?.data?.name) { 
+  console.log("CALLING notFound, userResult:", JSON.stringify(userResult));
+  notFound(); 
+}
 
     console.log("TOKEN:", token);
   console.log("CURRENT USER RESULT:", currentUserResult);
@@ -83,7 +86,7 @@ const [userResult, locationsResult, currentUserResult] = await Promise.all([
   const user = {
     id: userId,
     name: userResult.data.name || "Unknown User",
-    avatarUrl: userResult.data.avatarURL || "",
+    avatarUrl: userResult.data.avatarURL || userResult.data.avatar || "",
     articlesCount: locationsResult?.data?.totalItems || 0,
   };
 

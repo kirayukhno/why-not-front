@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { nextServer } from "@/lib/api/api";
+import { api } from "@/lib/api/api";
 import { isAxiosError } from "axios";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const apiRes = await nextServer.post("/auth/login", body);
+    const apiRes = await api.post("/auth/login", body);
 
     const responseData = {
       ...apiRes.data,
@@ -24,9 +24,12 @@ export async function POST(req: NextRequest) {
         : [setCookie];
 
       cookieArray.forEach((cookie) => {
+        console.log('Cookie being set:', cookie);
         res.headers.append("Set-Cookie", cookie);
       });
     }
+    console.log('Set-Cookie header:', setCookie);
+console.log('Response data:', apiRes.data);
 
     return res;
   } catch (error) {

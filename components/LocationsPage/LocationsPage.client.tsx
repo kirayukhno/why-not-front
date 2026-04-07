@@ -9,7 +9,7 @@ import {
   fetchLocations,
   fetchRegions,
 } from "@/lib/api/clientApi";
-import { Location, LocationType, Region } from "@/types";
+import { Location, LocationType, Region } from "@/types/types";
 import css from "./LocationsPage.module.css";
 
 export default function LocationsPageClient() {

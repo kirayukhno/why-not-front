@@ -1,19 +1,7 @@
-import { nextServer } from './api';
+import { nextServer, api } from './api';
 import type { User, Feedback, FeedbacksResponse } from '@/types/types';
 import { AxiosError } from 'axios';
-import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-const baseURL = "/api";
-
-export const clientApi = axios.create({
-  baseURL,
-  withCredentials: true,
-});
-
-export const nextClient = axios.create({
-  baseURL: "/api",
-  withCredentials: true,
-});
 
 export interface RegisterData {
   name: string;
@@ -35,7 +23,7 @@ export interface FetchLocationsParams {
 }
 
 export const fetchLocations = async (params: FetchLocationsParams) => {
-  const response = await clientApi.get("/locations", { params });
+  const response = await api.get("/locations", { params });
   const items = response.data.data || [];
   
   return {
@@ -45,18 +33,19 @@ export const fetchLocations = async (params: FetchLocationsParams) => {
 };
 
 export const fetchRegions = async () => {
-  const response = await clientApi.get("/categories/regions");
+  const response = await api.get("/categories/regions");
+ console.log("regions response:", response.data);
   return response.data.regions;
 };
 
 export const fetchLocationTypes = async () => {
-  const response = await clientApi.get("/categories/types");
+  const response = await api.get("/categories/location-types");
   return response.data.locationTypes;
 };
 
 export const register = async (data: RegisterData): Promise<User> => {
   try {
-    const response = await nextServer.post<User>('/auth/register', data);
+    const response = await nextServer.post<User>('/api/auth/register', data);
     return response.data;
   } catch (error) {
     const err = error as AxiosError<{ error?: string }>;
@@ -66,7 +55,7 @@ export const register = async (data: RegisterData): Promise<User> => {
 
 export async function login(data: LoginData) {
   try {
-    const res = await nextServer.post('/auth/login', data);
+    const res = await nextServer.post('/api/auth/login', data);
     return res.data;
   } catch (error: unknown) {
     if (error instanceof Error) throw new Error(error.message);
@@ -75,7 +64,7 @@ export async function login(data: LoginData) {
 }
 
 export const getLocationFeedbacks = async (locationId: string): Promise<Feedback[]> => {
-  const res = await nextServer.get<FeedbacksResponse>(
+  const res = await api.get<FeedbacksResponse>(
     `/locations/${locationId}/feedbacks`
   );
   return res.data?.feedbacks ?? [];
@@ -84,7 +73,7 @@ export const getLocationFeedbacks = async (locationId: string): Promise<Feedback
 export const clientUserService = {
   getCurrentUser: async () => {
     try {
-      const res = await nextServer.get('/users/current');
+      const res = await nextServer.get('/api/users/current');
       return res.data;
     } catch {
       return null;
@@ -92,7 +81,7 @@ export const clientUserService = {
   },
   getUserById: async (userId: string) => {
     try {
-      const res = await nextServer.get(`/users/${userId}`);
+      const res = await api.get(`/users/${userId}`);
       return res.data;
     } catch {
       return null;
@@ -100,9 +89,9 @@ export const clientUserService = {
   },
   getUserLocations: async (userId: string) => {
     try {
-      const res = await nextServer.get(`/users/${userId}/locations`);
+      const res = await api.get(`/users/${userId}/locations`);
       return res.data;
-    } catch (error) {
+    } catch  {
       return { data: { data: [], totalItems: 0 } };
     }
   },
@@ -110,21 +99,21 @@ export const clientUserService = {
 
 export const clientLocationService = {
   createLocation: async (formData: FormData) => {
-    const res = await nextServer.post('/locations', formData);
+    const res = await nextServer.post('/api/locations', formData);
     return res.data;
   },
   updateLocation: async (locationId: string, formData: FormData) => {
-    const res = await nextServer.patch(`/locations/${locationId}`, formData);
+    const res = await nextServer.patch(`/api/locations/${locationId}`, formData);
     return res.data;
   },
   getLocationById: async (locationId: string) => {
-    const res = await nextServer.get(`/locations/${locationId}`);
+    const res = await nextServer.get(`/api/locations/${locationId}`);
     return res.data;
   },
 };
 
 const fetchLocationsInternal = async (params: FetchLocationsParams) => {
-  const response = await clientApi.get("/locations", { params });
+  const response = await api.get("/locations", { params });
   return response.data.data || [];
 };
 
