@@ -6,6 +6,7 @@ import ReviewsSection from '@/components/ReviewsSection/ReviewsSection';
 import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import type { Feedback } from '@/types/types';
+import { findRegionLabel, findTypeLabel } from '@/lib/locationDisplay';
 
 interface ToolDetailsPageProps {
   params: Promise<{ locationId: string }>;
@@ -21,24 +22,14 @@ const getNumber = (value: unknown, fallback = 0) => {
 
 export async function generateMetadata({ params }: ToolDetailsPageProps): Promise<Metadata> {
   const { locationId } = await params;
-  const locationData = await getLocationById(locationId);
-
-  if (!locationData) {
-    return { title: 'Локацію не знайдено' };
-  }
-
-  const rawLocation = locationData as Record<string, unknown>;
-  const title = getString(rawLocation.name, 'Локація');
-  const description = getString(rawLocation.description).slice(0, 160);
-  const image = getString(rawLocation.image);
 
   return {
-    title,
-    description,
+    title: 'Локація',
+    description: `Детальний опис локації ${locationId}.`,
     openGraph: {
-      title,
-      description,
-      images: image ? [{ url: image }] : [],
+      title: 'Локація',
+      description: `Детальний опис локації ${locationId}.`,
+      images: [],
     },
   };
 }
@@ -108,13 +99,13 @@ export default async function ToolDetailsPage({ params }: ToolDetailsPageProps) 
 
   const title = getString(rawLocation.name, 'Локація');
   const rating = getNumber(rawLocation.rate ?? rawLocation.rating, 0);
-  const region =
-    getString(rawLocation.regionName) ||
-    getString(rawLocation.region);
-  const type =
+  const rawRegion = getString(rawLocation.regionName) || getString(rawLocation.region);
+  const rawType =
     getString(rawLocation.locationTypeName) ||
     getString(rawLocation.locationType) ||
     getString(rawLocation.type);
+  const region = findRegionLabel(rawRegion);
+  const type = findTypeLabel(rawType);
   const image = getString(rawLocation.image);
   const description = getString(rawLocation.description, 'Опис відсутній.');
 

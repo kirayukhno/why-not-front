@@ -1,10 +1,7 @@
-﻿import styles from './page.module.css';
-import ProfileInfo from '@/components/Profile/ProfileInfo';
-import LocationsGrid from '@/components/LocationsGrid/LocationsGrid';
-import ProfilePlaceholder from '@/components/Profile/ProfilePlaceholder';
+﻿import ProfilePageContent from '@/components/Profile/ProfilePageContent';
 import { notFound } from 'next/navigation';
 import { api } from '@/lib/api/api';
-import { serverUserService } from '@/lib/api/serverApi';
+import { getLocationById, serverUserService } from '@/lib/api/serverApi';
 import { findRegionLabel, findTypeLabel } from '@/lib/locationDisplay';
 import type { LocationType, Region, Location } from '@/types/types';
 import { Metadata } from 'next';
@@ -133,10 +130,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function ProfilePage({ params }: PageProps) {
   const { userId } = await params;
 
-  const [userResult, locationsResult, currentUserResult, regionsRes, typesRes] = await Promise.all([
+  const [userResult, locationsResult, regionsRes, typesRes] = await Promise.all([
     serverUserService.getUserById(userId),
     serverUserService.getUserLocations(userId),
-    serverUserService.getCurrentUser(),
     api.get('/categories/regions').catch(() => null),
     api.get('/categories/location-types').catch(() => null),
   ]);
@@ -145,55 +141,96 @@ export default async function ProfilePage({ params }: PageProps) {
     notFound();
   }
 
-  const isOwner = currentUserResult?.data?._id === userId;
   const locationsPayload = locationsResult?.data ?? locationsResult ?? {};
   const rawUserLocations = extractList<Record<string, unknown>>(locationsPayload);
   const regions = extractList<Region>(regionsRes?.data);
   const types = extractList<LocationType>(typesRes?.data);
 
-  const userLocations: Location[] = rawUserLocations.map((location) => {
-    const rawRegion =
-      (typeof location.region === 'string' ? location.region : null) ||
-      (location.region && typeof location.region === 'object' && 'slug' in location.region
-        ? String((location.region as Record<string, unknown>).slug || '')
-        : '') ||
-      (location.region && typeof location.region === 'object' && 'region' in location.region
-        ? String((location.region as Record<string, unknown>).region || '')
-        : '');
+  const userLocations: Location[] = await Promise.all(
+    rawUserLocations.map(async (location) => {
+      const rawRegion =
+        (typeof location.region === 'string' ? location.region : null) ||
+        (location.region && typeof location.region === 'object' && '_id' in location.region
+          ? String((location.region as Record<string, unknown>)._id || '')
+          : '') ||
+        (location.region && typeof location.region === 'object' && 'slug' in location.region
+          ? String((location.region as Record<string, unknown>).slug || '')
+          : '') ||
+        (location.region && typeof location.region === 'object' && 'region' in location.region
+          ? String((location.region as Record<string, unknown>).region || '')
+          : '');
 
-    const rawType =
-      (typeof location.locationType === 'string' ? location.locationType : null) ||
-      (typeof location.type === 'string' ? location.type : null) ||
-      (location.type && typeof location.type === 'object' && 'slug' in location.type
-        ? String((location.type as Record<string, unknown>).slug || '')
-        : '') ||
-      (location.type && typeof location.type === 'object' && 'type' in location.type
-        ? String((location.type as Record<string, unknown>).type || '')
-        : '');
+      const rawType =
+        (typeof location.type === 'string' ? location.type : null) ||
+        (location.type && typeof location.type === 'object' && '_id' in location.type
+          ? String((location.type as Record<string, unknown>)._id || '')
+          : '') ||
+        (location.type && typeof location.type === 'object' && 'slug' in location.type
+          ? String((location.type as Record<string, unknown>).slug || '')
+          : '') ||
+        (location.type && typeof location.type === 'object' && 'type' in location.type
+          ? String((location.type as Record<string, unknown>).type || '')
+          : '') ||
+        (typeof location.locationType === 'string' ? location.locationType : null) ||
+        (location.locationType &&
+        typeof location.locationType === 'object' &&
+        '_id' in location.locationType
+          ? String((location.locationType as Record<string, unknown>)._id || '')
+          : '') ||
+        (location.locationType &&
+        typeof location.locationType === 'object' &&
+        'slug' in location.locationType
+          ? String((location.locationType as Record<string, unknown>).slug || '')
+          : '') ||
+        (location.locationType &&
+        typeof location.locationType === 'object' &&
+        'type' in location.locationType
+          ? String((location.locationType as Record<string, unknown>).type || '')
+          : '');
 
-    const rawImage =
-      (typeof location.image === 'string' ? location.image : null) ||
-      (Array.isArray(location.images) && typeof location.images[0] === 'string'
-        ? location.images[0]
-        : '');
+      const rawImage =
+        (typeof location.image === 'string' ? location.image : null) ||
+        (Array.isArray(location.images) && typeof location.images[0] === 'string'
+          ? location.images[0]
+          : '');
 
-    return {
-      _id: String(location._id || ''),
-      name: String(location.name || ''),
-      description: typeof location.description === 'string' ? location.description : '',
-      region: rawRegion,
-      type: rawType,
-      image: toDataImage(rawImage),
-      images: Array.isArray(location.images)
-        ? location.images.filter((item): item is string => typeof item === 'string')
-        : undefined,
-      rate: Number(location.rate ?? location.rating ?? 0),
-      rating: Number(location.rating ?? location.rate ?? 0),
-      locationType: rawType,
-      locationTypeName: rawType ? findTypeLabel(rawType, types) : '',
-      regionName: rawRegion ? findRegionLabel(rawRegion, regions) : '',
-    };
-  });
+      const normalizedRegionName = rawRegion ? findRegionLabel(rawRegion, regions) : '';
+      const normalizedTypeName = rawType ? findTypeLabel(rawType, types) : '';
+      const details = location._id ? await getLocationById(String(location._id)) : null;
+
+      const finalTypeLabel = findTypeLabel(
+        String(details?.locationTypeName || normalizedTypeName || rawType || ''),
+        types,
+      );
+      const finalRegionLabel = findRegionLabel(
+        String(details?.regionName || normalizedRegionName || rawRegion || ''),
+        regions,
+      );
+
+      return {
+        _id: String(location._id || details?._id || ''),
+        name: String(location.name || details?.name || ''),
+        description:
+          typeof location.description === 'string'
+            ? location.description
+            : String(details?.description || ''),
+        region: details?.region || rawRegion,
+        type: details?.type || rawType,
+        image: details?.image || toDataImage(rawImage),
+        images: Array.isArray(location.images)
+          ? location.images.filter((item): item is string => typeof item === 'string')
+          : undefined,
+        rate: Number(location.rate ?? location.rating ?? details?.rate ?? details?.rating ?? 0),
+        rating: Number(
+          location.rating ?? location.rate ?? details?.rating ?? details?.rate ?? 0,
+        ),
+        locationType:
+          details?.locationType || finalTypeLabel || rawType,
+        locationTypeName: finalTypeLabel,
+        regionName: finalRegionLabel,
+      };
+    }),
+  );
 
   const totalItems = extractTotal(locationsPayload, userLocations.length);
   const currentPage = extractPage(locationsPayload);
@@ -208,23 +245,11 @@ export default async function ProfilePage({ params }: PageProps) {
   };
 
   return (
-    <main className={styles.wrapper}>
-      <ProfileInfo user={user} />
-      <div className={styles.locationsSection}>
-        {!isOwner && <h2 className={styles.sectionTitle}>Локації</h2>}
-
-        {userLocations.length > 0 ? (
-          <LocationsGrid
-            locations={userLocations}
-            isLoading={false}
-            isLoadingMore={false}
-            hasNextPage={hasMore}
-            onLoadMore={() => {}}
-          />
-        ) : (
-          <ProfilePlaceholder isOwner={isOwner} />
-        )}
-      </div>
-    </main>
+    <ProfilePageContent
+      profileUserId={userId}
+      user={user}
+      userLocations={userLocations}
+      hasMore={hasMore}
+    />
   );
 }

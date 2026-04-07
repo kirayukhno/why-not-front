@@ -1,7 +1,55 @@
 ﻿import { api } from './api';
 import { cookies } from 'next/headers';
-import type { Feedback, FeedbacksResponse } from '@/types/types';
+import type { Feedback, FeedbacksResponse, LocationType, Region } from '@/types/types';
 import { findRegionLabel, findTypeLabel } from '@/lib/locationDisplay';
+
+let regionsCache: Region[] | null = null;
+let locationTypesCache: LocationType[] | null = null;
+let categoriesPromise: Promise<void> | null = null;
+
+const extractRegions = (payload: unknown): Region[] => {
+  const data = payload as
+    | {
+        regions?: Region[];
+        data?: { regions?: Region[]; data?: Region[] };
+      }
+    | undefined;
+
+  return data?.regions ?? data?.data?.regions ?? data?.data?.data ?? [];
+};
+
+const extractLocationTypes = (payload: unknown): LocationType[] => {
+  const data = payload as
+    | {
+        locationTypes?: LocationType[];
+        data?: { locationTypes?: LocationType[]; data?: LocationType[] };
+      }
+    | undefined;
+
+  return data?.locationTypes ?? data?.data?.locationTypes ?? data?.data?.data ?? [];
+};
+
+const ensureCategoriesCache = async () => {
+  if (regionsCache && locationTypesCache) {
+    return;
+  }
+
+  if (!categoriesPromise) {
+    categoriesPromise = Promise.all([
+      api.get('/categories/regions'),
+      api.get('/categories/location-types'),
+    ])
+      .then(([regionsResponse, typesResponse]) => {
+        regionsCache = extractRegions(regionsResponse.data);
+        locationTypesCache = extractLocationTypes(typesResponse.data);
+      })
+      .finally(() => {
+        categoriesPromise = null;
+      });
+  }
+
+  await categoriesPromise;
+};
 
 const isValidImageUrl = (value: unknown) => {
   if (typeof value !== 'string' || !value.trim()) {
@@ -27,7 +75,9 @@ const toImageSrc = (value: unknown) => {
   return `data:image/jpeg;base64,${value}`;
 };
 
-const normalizeFeedbacks = (payload: unknown): Feedback[] => {
+const normalizeFeedbacks = async (payload: unknown): Promise<Feedback[]> => {
+  await ensureCategoriesCache();
+
   const data = payload as
     | { feedbacks?: Feedback[]; data?: { feedbacks?: Feedback[] } }
     | undefined;
@@ -37,6 +87,10 @@ const normalizeFeedbacks = (payload: unknown): Feedback[] => {
   return items.map((feedback) => ({
     ...feedback,
     id: feedback._id,
+    locationType:
+      typeof feedback.locationType === 'string'
+        ? findTypeLabel(feedback.locationType, locationTypesCache)
+        : feedback.locationType,
   }));
 };
 
@@ -46,6 +100,8 @@ const normalizeLocationDetails = async (
   if (!location) {
     return null;
   }
+
+  await ensureCategoriesCache();
 
   const rawImages = Array.isArray(location.images) ? location.images : [];
   const imageCandidate =
@@ -81,6 +137,10 @@ const normalizeLocationDetails = async (
   const rawRegion =
     typeof location.region === 'string'
       ? location.region
+      : location.region && typeof location.region === 'object' && '_id' in location.region
+        ? String(location.region._id)
+        : location.region && typeof location.region === 'object' && 'slug' in location.region
+          ? String(location.region.slug)
       : location.region && typeof location.region === 'object' && 'region' in location.region
         ? String(location.region.region)
         : '';
@@ -88,8 +148,24 @@ const normalizeLocationDetails = async (
   const rawType =
     typeof location.locationType === 'string'
       ? location.locationType
+      : location.locationType &&
+          typeof location.locationType === 'object' &&
+          '_id' in location.locationType
+        ? String(location.locationType._id)
+        : location.locationType &&
+            typeof location.locationType === 'object' &&
+            'slug' in location.locationType
+          ? String(location.locationType.slug)
+          : location.locationType &&
+              typeof location.locationType === 'object' &&
+              'type' in location.locationType
+            ? String(location.locationType.type)
       : typeof location.type === 'string'
         ? location.type
+        : location.type && typeof location.type === 'object' && '_id' in location.type
+          ? String(location.type._id)
+          : location.type && typeof location.type === 'object' && 'slug' in location.type
+            ? String(location.type.slug)
         : location.type && typeof location.type === 'object' && 'type' in location.type
           ? String(location.type.type)
           : '';
@@ -102,12 +178,12 @@ const normalizeLocationDetails = async (
     rate: Number(location.rate ?? location.rating ?? 0),
     regionName:
       typeof location.regionName === 'string' && location.regionName
-        ? findRegionLabel(location.regionName)
-        : findRegionLabel(rawRegion),
+        ? findRegionLabel(location.regionName, regionsCache)
+        : findRegionLabel(rawRegion, regionsCache),
     locationTypeName:
       typeof location.locationTypeName === 'string' && location.locationTypeName
-        ? findTypeLabel(location.locationTypeName)
-        : findTypeLabel(rawType),
+        ? findTypeLabel(location.locationTypeName, locationTypesCache)
+        : findTypeLabel(rawType, locationTypesCache),
   };
 };
 
@@ -117,7 +193,7 @@ export const getFeedbacks = async () => {
       params: { perPage: 10 },
     });
 
-    const feedbacks = normalizeFeedbacks(res.data);
+    const feedbacks = await normalizeFeedbacks(res.data);
 
     if (feedbacks.length > 0) {
       return feedbacks;
@@ -131,7 +207,7 @@ export const getFeedbacks = async () => {
       params: { perPage: 10 },
     });
 
-    return normalizeFeedbacks(fallbackRes.data);
+    return await normalizeFeedbacks(fallbackRes.data);
   } catch (error) {
     console.error('Server API Error (getFeedbacks fallback):', error);
     return [];
@@ -143,12 +219,12 @@ export const getLocationFeedbacks = async (locationId: string): Promise<Feedback
     const res = await api.get<FeedbacksResponse>(
       `/feedback/locations/${locationId}/feedbacks`,
     );
-    return (res.data?.feedbacks ?? []).map((f) => ({
+    const feedbacks = await normalizeFeedbacks(res.data);
+    return feedbacks.map((f) => ({
       ...f,
       id: f._id,
     }));
-  } catch (error) {
-    console.error(`Server API Error (getLocationFeedbacks primary ${locationId}):`, error);
+  } catch {
     try {
       const [locationsRes, feedbacksRes] = await Promise.all([
         api.get('/locations', { params: { page: 1, limit: 1000 } }),
@@ -174,11 +250,10 @@ export const getLocationFeedbacks = async (locationId: string): Promise<Feedback
         return [];
       }
 
-      const allFeedbacks = normalizeFeedbacks(feedbacksRes.data);
+      const allFeedbacks = await normalizeFeedbacks(feedbacksRes.data);
 
       return allFeedbacks.filter((feedback) => feedbackIds.includes(feedback._id));
-    } catch (error) {
-      console.error(`Server API Error (getLocationFeedbacks fallback ${locationId}):`, error);
+    } catch {
       return [];
     }
   }
@@ -188,8 +263,7 @@ export const getLocationById = async (locationId: string) => {
   try {
     const res = await api.get(`/locations/${locationId}`);
     return await normalizeLocationDetails(res.data.data);
-  } catch (error) {
-    console.error(`Server API Error (getLocationById primary ${locationId}):`, error);
+  } catch {
     try {
       const fallbackRes = await api.get('/locations', {
         params: { page: 1, limit: 1000 },
@@ -201,8 +275,7 @@ export const getLocationById = async (locationId: string) => {
       );
 
       return await normalizeLocationDetails(location);
-    } catch (error) {
-      console.error(`Server API Error (getLocationById fallback ${locationId}):`, error);
+    } catch {
       return null;
     }
   }
