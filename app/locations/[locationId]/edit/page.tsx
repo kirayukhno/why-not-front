@@ -1,4 +1,4 @@
-import { getLocationById } from '@/lib/api/serverApi';
+﻿import { getLocationById } from '@/lib/api/serverApi';
 import LocationForm from '@/components/LocationForm/LocationForm';
 
 type EditLocationPageProps = {
@@ -24,6 +24,17 @@ export default async function EditLocationPage({
     );
   }
 
+  const rawLocation = locationData as Record<string, unknown>;
+
+  const initialData = {
+    _id: String(rawLocation._id || locationId),
+    name: String(rawLocation.name || ''),
+    type: String(rawLocation.type || rawLocation.locationType || ''),
+    region: String(rawLocation.region || ''),
+    description: String(rawLocation.description || ''),
+    image: typeof rawLocation.image === 'string' ? rawLocation.image : '',
+  };
+
   return (
     <section className="section">
       <div className="container">
@@ -31,7 +42,7 @@ export default async function EditLocationPage({
         <LocationForm
           mode="edit"
           locationId={locationId}
-          initialData={locationData}
+          initialData={initialData}
         />
       </div>
     </section>
