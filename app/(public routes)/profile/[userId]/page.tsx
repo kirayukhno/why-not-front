@@ -10,6 +10,20 @@ interface PageProps {
   params: Promise<{ userId: string }>;
 }
 
+const isRegionLike = (value: unknown): value is Region =>
+  !!value &&
+  typeof value === 'object' &&
+  '_id' in value &&
+  'region' in value &&
+  'slug' in value;
+
+const isLocationTypeLike = (value: unknown): value is LocationType =>
+  !!value &&
+  typeof value === 'object' &&
+  '_id' in value &&
+  'type' in value &&
+  'slug' in value;
+
 const toDataImage = (value?: string) => {
   if (!value) {
     return '';
@@ -210,6 +224,10 @@ export default async function ProfilePage({ params }: PageProps) {
         String(details?.regionName || normalizedRegionName || rawRegion || ''),
         regions,
       );
+      const resolvedRegion = isRegionLike(details?.region) ? details.region : rawRegion;
+      const resolvedType = isLocationTypeLike(details?.type) ? details.type : rawType;
+      const resolvedLocationType =
+        typeof details?.locationType === 'string' ? details.locationType : finalTypeLabel || rawType;
 
       return {
         _id: String(location._id || details?._id || ''),
@@ -218,8 +236,8 @@ export default async function ProfilePage({ params }: PageProps) {
           typeof location.description === 'string'
             ? location.description
             : String(details?.description || ''),
-        region: details?.region || rawRegion,
-        type: details?.type || rawType,
+        region: resolvedRegion,
+        type: resolvedType,
         image: String(details?.image || toDataImage(rawImage)),
         images: Array.isArray(location.images)
           ? location.images.filter((item): item is string => typeof item === 'string')
@@ -228,8 +246,7 @@ export default async function ProfilePage({ params }: PageProps) {
         rating: Number(
           location.rating ?? location.rate ?? details?.rating ?? details?.rate ?? 0,
         ),
-        locationType:
-          details?.locationType || finalTypeLabel || rawType,
+        locationType: resolvedLocationType,
         locationTypeName: finalTypeLabel,
         regionName: finalRegionLabel,
       };
