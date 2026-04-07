@@ -1,7 +1,7 @@
 // app/api/users/me/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { api, ApiError } from "../../api";
+import { api, APIError } from "../../api";
 
 
 export async function GET() {
@@ -14,7 +14,7 @@ export async function GET() {
 
     return NextResponse.json(data, { status });
   } catch (error) {
-    const err = error as ApiError;
+    const err = error as APIError;
     console.error("Error fetching current user:", err.response?.data ?? err.message);
 
     return NextResponse.json(
@@ -45,7 +45,7 @@ export async function PATCH(req: NextRequest) {
 
     return res;
   } catch (error) {
-    const err = error as ApiError;
+    const err = error as APIError;
     console.error("Error updating user profile:", err.response?.data ?? err.message);
 
     return NextResponse.json(

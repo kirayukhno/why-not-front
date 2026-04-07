@@ -1,7 +1,7 @@
 // app/api/users/[id]/route.ts
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { api, ApiError } from "../../api";
+import { api, APIError } from "../../api";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -20,7 +20,7 @@ export async function GET(_req: Request, { params }: Props) {
 
     return NextResponse.json(data, { status });
   } catch (error) {
-    const err = error as ApiError;
+    const err = error as APIError;
     console.error("Error fetching user by ID:", err.response?.data ?? err.message);
 
     return NextResponse.json(
