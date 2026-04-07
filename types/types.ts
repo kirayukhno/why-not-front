@@ -1,5 +1,6 @@
 export interface User {
   id: string;
+  _id?: string;
   name: string;
   avatarUrl: string;
   articlesCount: number;
@@ -26,6 +27,11 @@ export interface Location {
   description?: string;
   region: Region | string;
   type: LocationType | string;
+  image?: string;
+  rate?: number;
+  locationType?: string;
+  locationTypeName?: string;
+  regionName?: string;
   images?: string[];
   rating?: number;
 }

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useRef, useState } from "react";
 import css from "./FilterPanel.module.css";
@@ -44,7 +44,12 @@ export default function FilterPanel({
   }, []);
 
   const selectedTypeName =
-    types.find((type) => type.slug === selectedType)?.type || "";
+    types.find(
+      (type) =>
+        type._id === selectedType ||
+        type.slug === selectedType ||
+        type.type === selectedType,
+    )?.type || "";
 
   return (
     <div className={css.wrapper}>
@@ -63,7 +68,7 @@ export default function FilterPanel({
       >
         <option value="">Регіон</option>
         {regions.map((region) => (
-          <option key={region._id} value={region.slug}>
+          <option key={region._id} value={region._id}>
             {region.region}
           </option>
         ))}
@@ -83,15 +88,15 @@ export default function FilterPanel({
           <div className={css.typeMenu}>
             {types.length > 0 ? (
               types.map((type) => (
-                <label key={type.slug} className={css.checkboxLabel}>
+                <label key={type._id} className={css.checkboxLabel}>
                   <input
                     className={css.checkbox}
                     type="checkbox"
-                    checked={selectedType === type.slug}
+                    checked={selectedType === type._id}
                     onChange={() => {
                       onChange(
                         "type",
-                        selectedType === type.slug ? "" : type.slug,
+                        selectedType === type._id ? "" : type._id,
                       );
                       setIsTypeOpen(false);
                     }}
@@ -109,7 +114,7 @@ export default function FilterPanel({
       <select
         className={css.sortSelect}
         value={selectedSort}
-        onChange={(e) => onChange('sort', e.target.value)}
+        onChange={(e) => onChange("sort", e.target.value)}
       >
         <option value="">Сортування</option>
         <option value="popular">За популярністю</option>

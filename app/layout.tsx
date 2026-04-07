@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import TanStackProvider from "@/components/TanStackProvider/TanStackProvider";
-import { Montserrat } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import "modern-normalize/modern-normalize.css";
@@ -8,13 +7,6 @@ import "modern-normalize/modern-normalize.css";
 
 import Header from "@/components/Header/Header";
 import Footer from "@/components/Footer/Footer";
-
-const montserrat = Montserrat({
-  subsets: ["cyrillic", "latin"],
-  weight: ["400", "700"],
-  variable: "--font-montserrat",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "Relax Map",
@@ -44,7 +36,19 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" data-scroll-behavior="smooth">
-      <body className={montserrat.variable}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body>
         <TanStackProvider>
           <Header />
 

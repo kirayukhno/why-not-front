@@ -2,6 +2,7 @@
 import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
 import '../../app/globals.css';
 import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 
 interface ExitModalProps {
     onClose: () => void;
@@ -9,8 +10,11 @@ interface ExitModalProps {
 
 export default function ExitModal({onClose}:ExitModalProps) {
     const { logout } = useAuth();
+    const router = useRouter();
     const handleExit = async () => {
         await logout();
+        router.push('/');
+        router.refresh();
     };
 
     return (

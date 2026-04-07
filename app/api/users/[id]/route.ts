@@ -14,7 +14,7 @@ export async function GET(_req: Request, { params }: Props) {
 
   try {
 
-    const { data, status } = await api.get(`/api/users/${id}`, {
+    const { data, status } = await api.get(`/users/${id}`, {
       headers: { cookie: cookieStore.toString() },
     });
 

@@ -2,6 +2,7 @@
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import type { FormikHelpers } from "formik";
+import { useQueryClient } from "@tanstack/react-query";
 import * as Yup from "yup";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
@@ -26,8 +27,9 @@ const validationSchema = Yup.object({
 
 export default function LoginForm() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("from") ?? "/";
+  const redirectTo = searchParams.get("from");
 
   const handleSubmit = async (
     values: LoginData,
@@ -35,7 +37,6 @@ export default function LoginForm() {
   ) => {
     try {
       const response = await login(values);
-      console.log('Login response:', response);
       const userId = response.userId || response.user?._id || response.user?.id;
 
       if (!userId) {
@@ -43,16 +44,11 @@ export default function LoginForm() {
       }
 
       toast.success('Успішний вхід!');
-      if (redirectTo) {
-        router.push(redirectTo);
-      } else {
-        router.push(`/profile/${userId}`);
-      }
-      
+      await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
+      await queryClient.refetchQueries({ queryKey: ["currentUser"] });
+      const nextPath = redirectTo || `/profile/${userId}`;
+      router.replace(nextPath);
       router.refresh();
-      //   window.location.href = redirectTo !== '/' 
-      // ? redirectTo 
-      // : `/profile/${userId}`;
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Помилка входу");
     } finally {

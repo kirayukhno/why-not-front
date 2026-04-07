@@ -1,4 +1,4 @@
-import { serverLocationService } from '@/lib/api/serverApi';
+import { getLocationById } from '@/lib/api/serverApi';
 import LocationForm from '@/components/LocationForm/LocationForm';
 
 type EditLocationPageProps = {
@@ -11,7 +11,7 @@ export default async function EditLocationPage({
   params,
 }: EditLocationPageProps) {
   const { locationId } = await params;
-  const locationData = await serverLocationService.getLocationById(locationId);
+  const locationData = await getLocationById(locationId);
 
   if (!locationData) {
     return (
@@ -31,7 +31,7 @@ export default async function EditLocationPage({
         <LocationForm
           mode="edit"
           locationId={locationId}
-          initialData={locationData.data}
+          initialData={locationData}
         />
       </div>
     </section>

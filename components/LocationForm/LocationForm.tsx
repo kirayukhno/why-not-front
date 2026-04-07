@@ -1,12 +1,17 @@
-'use client';
+﻿'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import toast from 'react-hot-toast';
 import css from './LocationForm.module.css';
-import { clientLocationService } from '@/lib/api/clientApi';
+import {
+  clientLocationService,
+  fetchLocationTypes,
+  fetchRegions,
+} from '@/lib/api/clientApi';
+import type { LocationType, Region } from '@/types/types';
 
 type LocationFormValues = {
   name: string;
@@ -21,7 +26,12 @@ type LocationInitialData = {
   name: string;
   type: string;
   region: string;
+  locationType?: string;
   description: string;
+  coordinates?: {
+    lat?: number;
+    lon?: number;
+  };
   image?: string;
 };
 
@@ -29,6 +39,42 @@ type LocationFormProps = {
   mode?: 'create' | 'edit';
   locationId?: string;
   initialData?: LocationInitialData;
+};
+
+const resolveRegionValue = (regions: Region[], initialData?: LocationInitialData) => {
+  const rawValue = initialData?.region || '';
+
+  if (!rawValue) {
+    return '';
+  }
+
+  const match = regions.find((region) => {
+    return (
+      region._id === rawValue ||
+      region.slug === rawValue ||
+      region.region === rawValue
+    );
+  });
+
+  return match?._id || rawValue;
+};
+
+const resolveTypeValue = (types: LocationType[], initialData?: LocationInitialData) => {
+  const rawValue = initialData?.type || initialData?.locationType || '';
+
+  if (!rawValue) {
+    return '';
+  }
+
+  const match = types.find((type) => {
+    return (
+      type._id === rawValue ||
+      type.slug === rawValue ||
+      type.type === rawValue
+    );
+  });
+
+  return match?._id || rawValue;
 };
 
 const validationSchema = Yup.object({
@@ -50,35 +96,19 @@ const validationSchema = Yup.object({
     .max(6000, 'Максимум 6000 символів')
     .required("Це поле є обов'язковим"),
 
-  image: Yup.mixed<File | null>().test(
+  image: Yup.mixed<File>().nullable().test(
     'fileValidation',
     'Фото має бути JPG/PNG і менше 1MB',
-    value => {
+    (value) => {
       if (!value) return true;
 
       const validType = ['image/jpeg', 'image/png'].includes(value.type);
       const validSize = value.size <= 1024 * 1024;
 
       return validType && validSize;
-    }
+    },
   ),
 });
-
-const typeOptions = [
-  { value: '', label: 'Оберіть тип місця' },
-  { value: 'beach', label: 'Пляж' },
-  { value: 'mountains', label: 'Гори' },
-  { value: 'forest', label: 'Ліс' },
-  { value: 'camping', label: 'Кемпінг' },
-];
-
-const regionOptions = [
-  { value: '', label: 'Оберіть регіон' },
-  { value: 'Odesa', label: 'Одеська область' },
-  { value: 'Lviv', label: 'Львівська область' },
-  { value: 'Kyiv', label: 'Київська область' },
-  { value: 'Zakarpattia', label: 'Закарпатська область' },
-];
 
 function PlaceholderIcon() {
   return (
@@ -106,22 +136,42 @@ export default function LocationForm({
   initialData,
 }: LocationFormProps) {
   const router = useRouter();
+  const [types, setTypes] = useState<LocationType[]>([]);
+  const [regions, setRegions] = useState<Region[]>([]);
 
   const [preview, setPreview] = useState<string | null>(
-    initialData?.image || null
+    initialData?.image || null,
   );
+
+  useEffect(() => {
+    const loadOptions = async () => {
+      try {
+        const [locationTypes, regionsData] = await Promise.all([
+          fetchLocationTypes(),
+          fetchRegions(),
+        ]);
+
+        setTypes(locationTypes || []);
+        setRegions(regionsData || []);
+      } catch (error) {
+        console.error('Failed to load location form options:', error);
+      }
+    };
+
+    loadOptions();
+  }, []);
 
   const initialValues: LocationFormValues = {
     name: initialData?.name || '',
-    type: initialData?.type || '',
-    region: initialData?.region || '',
+    type: resolveTypeValue(types, initialData),
+    region: resolveRegionValue(regions, initialData),
     description: initialData?.description || '',
     image: null,
   };
 
   const handleSubmit = async (
     values: LocationFormValues,
-    { setSubmitting }: FormikHelpers<LocationFormValues>
+    { setSubmitting }: FormikHelpers<LocationFormValues>,
   ) => {
     try {
       const formData = new FormData();
@@ -143,12 +193,12 @@ export default function LocationForm({
       toast.success(
         mode === 'edit'
           ? 'Локацію успішно оновлено'
-          : 'Локацію успішно створено'
+          : 'Локацію успішно створено',
       );
 
       router.push(`/locations/${data.data._id}`);
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || 'Сталася помилка');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Сталася помилка');
     } finally {
       setSubmitting(false);
     }
@@ -192,7 +242,7 @@ export default function LocationForm({
               type="file"
               accept="image/png, image/jpeg"
               className={css.fileInput}
-              onChange={event => {
+              onChange={(event) => {
                 const file = event.currentTarget.files?.[0] || null;
                 setFieldValue('image', file);
 
@@ -232,9 +282,10 @@ export default function LocationForm({
             </label>
 
             <Field as="select" id="type" name="type" className={css.select}>
-              {typeOptions.map(option => (
-                <option key={option.value || 'empty-type'} value={option.value}>
-                  {option.label}
+              <option value="">Оберіть тип місця</option>
+              {types.map((option) => (
+                <option key={option._id} value={option._id}>
+                  {option.type}
                 </option>
               ))}
             </Field>
@@ -253,12 +304,10 @@ export default function LocationForm({
               name="region"
               className={css.select}
             >
-              {regionOptions.map(option => (
-                <option
-                  key={option.value || 'empty-region'}
-                  value={option.value}
-                >
-                  {option.label}
+              <option value="">Оберіть регіон</option>
+              {regions.map((option) => (
+                <option key={option._id} value={option._id}>
+                  {option.region}
                 </option>
               ))}
             </Field>

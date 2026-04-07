@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
@@ -19,17 +19,12 @@ interface ReviewFormValues {
 
 interface CreateReviewPayload {
   locationId: string;
-  userName: string;
   description: string;
   rate: number;
 }
 
 interface CreateReviewResponse {
   message?: string;
-  _id?: string;
-  rate?: number;
-  description?: string;
-  userName?: string;
 }
 
 type StarVariant = 'empty' | 'selected';
@@ -49,7 +44,6 @@ const reviewSchema = Yup.object({
     .min(1, 'Мінімум 1 символ')
     .max(200, 'Максимум 200 символів')
     .required('Введіть відгук'),
-
   rate: Yup.number()
     .min(1, 'Оберіть рейтинг')
     .max(5, 'Максимум 5 зірок')
@@ -72,10 +66,8 @@ function StarIcon({ variant }: StarIconProps) {
   );
 }
 
-async function createReview(
-  payload: CreateReviewPayload
-): Promise<CreateReviewResponse> {
-  const response = await fetch('/api/reviews', {
+async function createReview(payload: CreateReviewPayload): Promise<CreateReviewResponse> {
+  const response = await fetch('/api/feedbacks', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -83,13 +75,10 @@ async function createReview(
     body: JSON.stringify(payload),
   });
 
-  const data = (await response.json().catch(() => null)) as
-    | CreateReviewResponse
-    | { message?: string }
-    | null;
+  const data = (await response.json().catch(() => null)) as { message?: string; error?: string } | null;
 
   if (!response.ok) {
-    throw new Error(data?.message || 'Не вдалося надіслати відгук');
+    throw new Error(data?.message || data?.error || 'Не вдалося надіслати відгук');
   }
 
   return {
@@ -97,42 +86,34 @@ async function createReview(
   };
 }
 
-export default function AddReviewForm({
-  locationId,
-  onCancel,
-  onSuccess,
-}: AddReviewFormProps) {
+export default function AddReviewForm({ locationId, onCancel, onSuccess }: AddReviewFormProps) {
   const [serverError, setServerError] = useState('');
   const [hoveredRating, setHoveredRating] = useState(0);
   const { user } = useAuth();
 
   const handleSubmit = async (
-  values: ReviewFormValues,
-  actions: FormikHelpers<ReviewFormValues>
+    values: ReviewFormValues,
+    actions: FormikHelpers<ReviewFormValues>,
   ): Promise<void> => {
     if (!user) return;
-  setServerError('');
 
-  try {
-    await createReview({
-      locationId,
-      userName: user.name,
-      description: values.description.trim(),
-      rate: values.rate,
-    });
+    setServerError('');
 
-    actions.resetForm();
-    onSuccess();
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      setServerError(error.message);
-    } else {
-      setServerError('Сталася помилка. Спробуйте ще раз.');
+    try {
+      await createReview({
+        locationId,
+        description: values.description.trim(),
+        rate: values.rate,
+      });
+
+      actions.resetForm();
+      onSuccess();
+    } catch (error: unknown) {
+      setServerError(error instanceof Error ? error.message : 'Сталася помилка. Спробуйте ще раз.');
+    } finally {
+      actions.setSubmitting(false);
     }
-  } finally {
-    actions.setSubmitting(false);
-  }
-};
+  };
 
   return (
     <Formik<ReviewFormValues>
@@ -143,65 +124,55 @@ export default function AddReviewForm({
       {({ values, setFieldValue, isSubmitting, touched, errors }) => (
         <Form className={css.form}>
           <div>
-            <label htmlFor="comment" className={css.label}>
+            <label htmlFor="description" className={css.label}>
               Ваш відгук
             </label>
 
             <Field
               as="textarea"
               id="description"
+              name="description"
               className={`${css.textarea} ${
                 touched.description && errors.description ? css.textareaError : ''
               }`}
               placeholder="Напишіть ваш відгук"
             />
 
-            <ErrorMessage name="comment" component="p" className={css.errorText} />
+            <ErrorMessage name="description" component="p" className={css.errorText} />
           </div>
 
           <div>
             <div className={css.stars}>
-              {[1, 2, 3, 4, 5].map((star: number) => (
+              {[1, 2, 3, 4, 5].map((star) => (
                 <button
                   key={star}
                   type="button"
                   className={css.starBtn}
-                  onClick={() => setFieldValue('rating', star)}
+                  onClick={() => setFieldValue('rate', star)}
                   onMouseEnter={() => setHoveredRating(star)}
                   onMouseLeave={() => setHoveredRating(0)}
                   aria-label={`Оцінка ${star}`}
                 >
                   <StarIcon
                     variant={
-                      (hoveredRating || values.rate) >= star
-                        ? 'selected'
-                        : 'empty'
+                      (hoveredRating || values.rate) >= star ? 'selected' : 'empty'
                     }
                   />
                 </button>
               ))}
             </div>
 
-            <ErrorMessage name="rating" component="p" className={css.errorText} />
+            <ErrorMessage name="rate" component="p" className={css.errorText} />
           </div>
 
           {serverError && <p className={css.errorText}>{serverError}</p>}
 
           <div className={css.actions}>
-            <button
-              type="button"
-              className={css.cancelBtn}
-              onClick={onCancel}
-              disabled={isSubmitting}
-            >
+            <button type="button" className={css.cancelBtn} onClick={onCancel} disabled={isSubmitting}>
               Відмінити
             </button>
 
-            <button
-              type="submit"
-              className={css.submitBtn}
-              disabled={isSubmitting}
-            >
+            <button type="submit" className={css.submitBtn} disabled={isSubmitting}>
               {isSubmitting ? 'Надсилання...' : 'Надіслати'}
             </button>
           </div>

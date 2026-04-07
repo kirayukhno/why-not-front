@@ -5,13 +5,11 @@ import ReviewsBlock from '../ReviewsBlock/ReviewsBlock';
 import AuthPromptModal from '../AuthPromptModal/AuthPromptModal';
 import AddReviewModal from '../AddReviewModal/AddReviewModal';
 import styles from './ReviewsSection.module.css';
-import type { Review } from '../ReviewsBlock/ReviewsBlock';
+import type { Feedback } from '@/types/types';
 
-type Feedback = {
+type ReviewCardData = Omit<Feedback, '_id'> & {
+  id: string;
   _id: string;
-  rate: number;
-  description?: string;
-  userName: string;
 };
 
 interface ReviewsSectionProps {
@@ -19,8 +17,12 @@ interface ReviewsSectionProps {
   feedbacks: Feedback[];
 }
 
-export default function ReviewsSection({ locationId, feedbacks }: ReviewsSectionProps) {
-  const locationFeedback: Review[] = feedbacks.map((feedback) => ({
+export default function ReviewsSection({
+  locationId,
+  feedbacks,
+}: ReviewsSectionProps) {
+  const locationFeedback: ReviewCardData[] = feedbacks.map((feedback) => ({
+    _id: feedback._id,
     id: feedback._id,
     locationId,
     userName: feedback.userName,
@@ -50,7 +52,7 @@ export default function ReviewsSection({ locationId, feedbacks }: ReviewsSection
       </div>
       <ReviewsBlock reviews={locationFeedback} />
       {isAuthPromptOpen && <AuthPromptModal onClose={() => setIsAuthPromptOpen(false)} />}
-      {isAddReviewOpen && <AddReviewModal onClose={() => setIsAddReviewOpen(false)} bookingId={locationId} />}
+      {isAddReviewOpen && <AddReviewModal onClose={() => setIsAddReviewOpen(false)} locationId={locationId} />}
     </section>
   );
 }

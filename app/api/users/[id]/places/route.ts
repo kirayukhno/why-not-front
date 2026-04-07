@@ -17,7 +17,7 @@ export async function GET(req: NextRequest, { params }: Props) {
     const page = searchParams.get("page") || "1";
     const limit = searchParams.get("limit") || "6";
 
-    const { data, status } = await api.get(`/api/users/${id}/locations`, {
+    const { data, status } = await api.get(`/users/${id}/locations`, {
       params: { page, limit },
       headers: { cookie: cookieStore.toString() },
     });

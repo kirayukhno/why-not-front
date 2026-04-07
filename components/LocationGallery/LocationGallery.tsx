@@ -13,13 +13,16 @@ export const LocationGallery = ({
   return (
     <div className="container">
       <div className={styles.locationGallery}>
-        <Image
-          src={imageSrc}
-          alt={imageAlt}
-          fill
-          sizes="(min-width: 1440px) 705px, 100vw"
-          className={styles.image}
-        />
+        {imageSrc ? (
+          <Image
+            src={imageSrc}
+            alt={imageAlt}
+            fill
+            sizes="(min-width: 1440px) 705px, 100vw"
+            className={styles.image}
+            unoptimized={imageSrc.startsWith("data:image/")}
+          />
+        ) : null}
       </div>
     </div>
   );
