@@ -1,10 +1,8 @@
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError } from "axios";
 
-export type ApiError = AxiosError<{ error: string }>
-
-const baseURL = process.env.NEXT_PUBLIC_API_URL;
+export type APIError = AxiosError<{ error: string }>;
 
 export const api = axios.create({
-  baseURL,
+  baseURL: "https://relax-map-back.onrender.com/",
   withCredentials: true,
 });
