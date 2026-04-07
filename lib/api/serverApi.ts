@@ -12,6 +12,7 @@ export const getFeedbacks = async () => {
       id: f._id,
     }));
   } catch (error) {
+    console.error('Error fetching feedbacks:', error);
     return [];
   }
 };
@@ -63,6 +64,16 @@ export const serverUserService = {
       return res.data;
     } catch {
       return { data: { data: [], totalItems: 0 } };
+    }
+  },
+};  export const serverLocationService = {
+  getLocationById: async (locationId: string) => {
+    try {
+      const res = await nextServer.get(`/locations/${locationId}`);
+      return res.data;
+    } catch (error) {
+      console.error(`Server API Error (getLocationById):`, error);
+      return null;
     }
   },
 };
