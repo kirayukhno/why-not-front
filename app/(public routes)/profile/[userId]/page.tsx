@@ -58,7 +58,7 @@ export default async function ProfilePage({ params }: PageProps) {
   const { userId } = await params;
   const cookieStore = await cookies();
  
-  const token = cookieStore.get('token')?.value;
+  const token = cookieStore.get('accessToken')?.value;
 
 
 const [userResult, locationsResult, currentUserResult] = await Promise.all([

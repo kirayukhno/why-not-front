@@ -34,15 +34,29 @@ export default function LoginForm() {
     actions: FormikHelpers<LoginData>,
   ) => {
     try {
-      await login(values);
-      router.push(redirectTo);
+      const response = await login(values);
+      
+      const userId = response.userId || response.user?._id || response.user?.id;
+
+      if (!userId) {
+        throw new Error('User ID не знайдено');
+      }
+
+      toast.success('Успішний вхід!');
+      if (redirectTo) {
+        router.push(redirectTo);
+      } else {
+        router.push(`/profile/${userId}`);
+      }
+      
+      router.refresh();
+      
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Помилка входу");
     } finally {
       actions.setSubmitting(false);
     }
   };
-
   return (
     <Formik
       initialValues={initialValues}
