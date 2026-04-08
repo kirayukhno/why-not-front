@@ -27,13 +27,13 @@
   font-size: 16px;
   line-height: 150%;
   letter-spacing: 0%;
-  padding-left: 12px;
-  padding-right: 12px;
+  padding: 6px 12px;
   text-wrap: nowrap;
 }
 
 .swiperContainer {
   position: relative;
+  margin-top: 40px;
 }
 
 .swiper {
@@ -77,11 +77,9 @@
 }
 
 .category {
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 140%;
-  color: rgba(0, 0, 0, 0.6);
-  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #0d0b0a;
 }
 
 .stars {
@@ -90,7 +88,7 @@
   font-size: 16px;
 }
 
-.starFull {
+/* .starFull {
   color: #cc6534;
 }
 
@@ -103,7 +101,7 @@
 
 .starEmpty {
   color: rgba(0, 0, 0, 0.2);
-}
+} */
 
 .cardTitle {
   font-weight: 700;
@@ -136,6 +134,10 @@
   color: #fff;
 }
 
+.buttonCont{
+  display: flex;
+  margin-top: 40px;
+}
 .navigationButton {
   position: absolute;
   bottom: 0;

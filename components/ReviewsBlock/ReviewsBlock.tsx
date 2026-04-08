@@ -44,7 +44,7 @@ export default function ReviewsBlock({ reviews }: FeedbacksBlockProps) {
 
   return (
     <section className={styles.reviewsBlock}>
-      <h2 className={styles.title}>Останні відгуки</h2>
+      {/* <h2 className={styles.title}>Останні відгуки</h2> */}
 
       <Swiper
         modules={[Navigation]}

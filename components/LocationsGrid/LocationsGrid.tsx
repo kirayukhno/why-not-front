@@ -7,6 +7,7 @@ type LocationsGridProps = {
   isLoading: boolean;
   isLoadingMore: boolean;
   hasNextPage: boolean;
+  scrollTargetIndex: number | null;
   onLoadMore: () => void;
 };
 
@@ -15,6 +16,7 @@ export default function LocationsGrid({
   isLoading,
   isLoadingMore,
   hasNextPage,
+  scrollTargetIndex,
   onLoadMore,
 }: LocationsGridProps) {
   if (isLoading) {
@@ -28,14 +30,22 @@ export default function LocationsGrid({
   return (
     <div>
       <div className={css.grid}>
-        {locations.map((location) => (
-          <LocationCard key={location._id} location={location} />
+        {locations.map((location, index) => (
+          <div
+            key={location._id}
+            data-location-index={
+              scrollTargetIndex === index ? String(index) : undefined
+            }
+          >
+            <LocationCard location={location} />
+          </div>
         ))}
       </div>
 
       {hasNextPage && (
         <div className={css.buttonWrap}>
           <button
+            type="button"
             className="primary-btn"
             onClick={onLoadMore}
             disabled={isLoadingMore}

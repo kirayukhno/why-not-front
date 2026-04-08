@@ -120,6 +120,14 @@ button:disabled {
   border: 1px solid #cc6534;
   color: #1b391b;
 }
+.primary-btn:active {
+  background-color: #254c24;
+  border: 1px solid #254c24;
+  color: #fff;
+}
+.primary-btn:disabled {
+  border: 1px solid #cc6534;
+}
 .secondary-btn {
   display: flex;
   align-items: center;

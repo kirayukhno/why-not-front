@@ -7,6 +7,7 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import type { Feedback } from '@/types/types';
 import { findRegionLabel, findTypeLabel } from '@/lib/locationDisplay';
+import css from './page.module.css';
 
 interface ToolDetailsPageProps {
   params: Promise<{ locationId: string }>;
@@ -111,15 +112,22 @@ export default async function ToolDetailsPage({ params }: ToolDetailsPageProps) 
 
   return (
     <div className="container">
-      <LocationInfoBlock
-        title={title}
-        rating={rating}
-        region={region}
-        type={type}
-        authorId={authorId}
-        authorName={authorName}
-      />
-      <LocationGallery imageSrc={image} imageAlt={title} />
+      <div className={css.details}>
+        <div className={css.image}>
+          <LocationGallery imageSrc={image} imageAlt={title} />
+        </div>
+        <div className={css.location}>
+          <LocationInfoBlock
+            title={title}
+            rating={rating}
+            region={region}
+            type={type}
+            authorId={authorId}
+            authorName={authorName}
+          />
+        </div>
+
+      </div>
       <LocationDescription text={description} />
       <ReviewsSection locationId={locationId} feedbacks={resolvedFeedbacks} />
     </div>

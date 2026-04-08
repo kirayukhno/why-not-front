@@ -2,6 +2,7 @@
   overflow: hidden;
   border-radius: 16px;
   background-color: #ffe5d9;
+  width: 335px;
 }
 
 .imagePlaceholder {
@@ -23,7 +24,7 @@
 }
 
 .typeText {
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.5;
   color: #0d0b0a;
 }
@@ -51,8 +52,16 @@
   .imagePlaceholder {
     height: 245px;
   }
+  .card {
+    width: 340px;
+  }
 
   .title {
     font-size: 20px;
+  }
+}
+@media screen and (min-width: 1440px) {
+  .card {
+    width: 421px;
   }
 }

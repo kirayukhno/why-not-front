@@ -125,8 +125,8 @@ export default function PopularLocations() {
               </SwiperSlide>
             ))}
           </Swiper>
-
-          <button
+          <div className={css.buttonCont}>
+            <button
             onClick={handlePrevClick}
             className={`${css.navigationButton} ${css.buttonPrev}`}
             aria-label="Попередня локація"
@@ -164,6 +164,8 @@ export default function PopularLocations() {
               />
             </svg>
           </button>
+</div>
+          
         </div>
       </div>
     </section>

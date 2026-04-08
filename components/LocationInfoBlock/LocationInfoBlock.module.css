@@ -3,6 +3,7 @@
   flex-direction: column;
   gap: 12px;
   padding: 9px 0px;
+  color: #1b391b;
 }
 
 .ratingRow {
@@ -38,7 +39,7 @@
   font-size: 32px;
   line-height: 110%;
   letter-spacing: -0.01em;
-  color: var(--text-secondary);
+  color: inherit;
 }
 
 .metaList {
@@ -55,19 +56,20 @@
   font-weight: 700;
   font-size: 16px;
   line-height: 150%;
-  color: var(--text-secondary);
+  color: inherit;
 }
 
 .metaText {
   font-weight: 400;
   font-size: 16px;
   line-height: 150%;
-  color: var(--neutral-dark);
+  color: inherit;
 }
 
 .metaTextLink {
   text-decoration: underline;
   text-decoration-skip-ink: none;
+  color: inherit;
 }
 
 @media screen and (min-width: 768px) {

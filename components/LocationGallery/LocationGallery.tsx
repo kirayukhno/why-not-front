@@ -11,7 +11,6 @@ export const LocationGallery = ({
   imageAlt,
 }: LocationGalleryProps) => {
   return (
-    <div className="container">
       <div className={styles.locationGallery}>
         {imageSrc ? (
           <Image
@@ -24,6 +23,5 @@ export const LocationGallery = ({
           />
         ) : null}
       </div>
-    </div>
   );
 };

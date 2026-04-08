@@ -1,0 +1,49 @@
+.reviews {
+    padding: 64px 0;
+}
+
+.header {
+display: flex;
+flex-direction: row;
+height: 48px;
+justify-content: space-between;
+align-items: center;
+    margin-bottom: 40px;
+}
+
+.button {
+    line-height: 1.5;
+    padding: 6px 12px;
+    height: 100%;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: #4c2613;
+}
+
+@media screen and (min-width: 768px) {
+    .reviews {
+        padding: 64px 0;
+    }
+    .title {
+        font-size: 44px;
+    }
+}
+
+@media screen and (min-width: 1440px) {
+    .reviews {
+        padding: 72px 0;
+    }
+    .title {
+        font-size: 52px;
+    }
+    .button {
+        font-size: 20px;
+        width: 202px;
+        white-space: nowrap;
+    }
+}

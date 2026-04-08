@@ -43,10 +43,10 @@ export default function ReviewsSection({
   };
 
   return (
-    <section className={styles.reviewsSection}>
+    <section className={styles.reviews}>
       <div className={styles.header}>
-        <h2>Відгуки</h2>
-        <button onClick={handleAddReviewClick} className="primary-btn">
+        <h2 className={styles.title}>Відгуки</h2>
+        <button onClick={handleAddReviewClick} className={styles.button + " primary-btn"}>
           Залишити відгук
         </button>
       </div>

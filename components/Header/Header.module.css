@@ -18,7 +18,9 @@
   color: #101828;
   text-decoration: none;
 }
-
+.linkprofile {
+  align-self: center;
+}
 .nav {
   display: none;
 }
@@ -89,6 +91,7 @@
   .sharelocation {
   background-color: #CC6534;
   color: #fff;
+  padding: 4px 10px;
   }
   .sharelocation:hover {
     opacity: 0.8;

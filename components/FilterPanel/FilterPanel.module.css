@@ -194,15 +194,13 @@
   }
 
   .typeDropdown,
-  .select,
-  .sortSelect {
+  .select{
     width: 100%;
     max-width: none;
   }
-
-  .sortSelect {
-    justify-self: stretch;
-  }
+    .sortSelect {
+      width: 158px;
+    }
 }
 
 /* desktop */

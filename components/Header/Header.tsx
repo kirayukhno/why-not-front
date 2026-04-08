@@ -80,7 +80,7 @@ export default function Header() {
           <Link href="/" onClick={() => setIsOpen(false)}>
             Головна
           </Link>
-          <Link href="..\LocationGallery" onClick={() => setIsOpen(false)}>
+          <Link href="/locations" onClick={() => setIsOpen(false)}>
             Місця відпочинку
           </Link>
 
@@ -89,7 +89,7 @@ export default function Header() {
               <Link href="/profile" onClick={() => setIsOpen(false)}>
                 Профіль
               </Link>
-              <Link href="/LocationDescription" className={styles.register} onClick={() => setIsOpen(false)}>
+              <Link href="/locations/add" className={styles.register} onClick={() => setIsOpen(false)}>
                 Опублікувати статтю
               </Link>
 

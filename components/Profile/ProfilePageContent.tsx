@@ -24,7 +24,7 @@ export default function ProfilePageContent({
   const isOwner = currentUser?.id === profileUserId;
 
   return (
-    <main className={styles.wrapper}>
+    <main className="container">
       <ProfileInfo user={user} />
       <div className={styles.locationsSection}>
         {!isOwner && <h2 className={styles.sectionTitle}>Локації</h2>}

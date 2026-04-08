@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import FilterPanel from "../FilterPanel/FilterPanel";
 import LocationsGrid from "../LocationsGrid/LocationsGrid";
@@ -15,7 +15,6 @@ import css from "./LocationsPage.module.css";
 export default function LocationsPageClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const gridRef = useRef<HTMLDivElement | null>(null);
 
   const [locations, setLocations] = useState<Location[]>([]);
   const [regions, setRegions] = useState<Region[]>([]);
@@ -25,6 +24,7 @@ export default function LocationsPageClient() {
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [scrollTargetIndex, setScrollTargetIndex] = useState<number | null>(null);
 
   const searchValue = searchParams.get("search") || "";
   const selectedRegion = searchParams.get("region") || "";
@@ -67,6 +67,7 @@ export default function LocationsPageClient() {
       try {
         setIsLoading(true);
         setCurrentPage(1);
+        setScrollTargetIndex(null);
 
         const data = await fetchLocations({
           page: 1,
@@ -91,9 +92,29 @@ export default function LocationsPageClient() {
     getLocations();
   }, [searchValue, selectedRegion, selectedType, selectedSort]);
 
+  useEffect(() => {
+    if (scrollTargetIndex === null || locations.length <= scrollTargetIndex) {
+      return;
+    }
+
+    const scrollTarget = document.querySelector<HTMLElement>(
+      `[data-location-index="${scrollTargetIndex}"]`,
+    );
+
+    if (!scrollTarget) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      scrollTarget.scrollIntoView({ behavior: "smooth", block: "start" });
+      setScrollTargetIndex(null);
+    });
+  }, [locations, scrollTargetIndex]);
+
   const handleLoadMore = async () => {
     try {
       const nextPage = currentPage + 1;
+      const nextBatchStartIndex = locations.length;
       setIsLoadingMore(true);
 
       const data = await fetchLocations({
@@ -108,9 +129,7 @@ export default function LocationsPageClient() {
       setLocations((prev) => [...prev, ...data.items]);
       setCurrentPage(nextPage);
       setHasNextPage(Boolean(data.hasNextPage));
-      setTimeout(() => {
-        gridRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-      }, 0);
+      setScrollTargetIndex(nextBatchStartIndex);
     } catch (error) {
       console.error("Failed to load more locations:", error);
     } finally {
@@ -120,7 +139,7 @@ export default function LocationsPageClient() {
 
   return (
     <section className={`section ${css.sectionOverride}`}>
-      <div className={css.pageWrap}>
+      <div className="container">
         <h1 className={css.title}>Усі місця відпочинку</h1>
         <FilterPanel
           regions={regions}
@@ -132,12 +151,13 @@ export default function LocationsPageClient() {
           onChange={updateSearchParams}
         />
 
-        <div ref={gridRef}>
+        <div>
           <LocationsGrid
             locations={locations}
             isLoading={isLoading}
             isLoadingMore={isLoadingMore}
             hasNextPage={hasNextPage}
+            scrollTargetIndex={scrollTargetIndex}
             onLoadMore={handleLoadMore}
           />
         </div>

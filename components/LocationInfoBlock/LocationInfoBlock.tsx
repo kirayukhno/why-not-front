@@ -25,7 +25,6 @@ export const LocationInfoBlock = ({
   const ratingText = hasRating ? rating.toFixed(1) : null;
 
   return (
-    <div className="container">
       <div
         className={[styles.locationInfoBlock, className]
           .filter(Boolean)
@@ -90,6 +89,5 @@ export const LocationInfoBlock = ({
           </div>
         </div>
       </div>
-    </div>
   );
 };

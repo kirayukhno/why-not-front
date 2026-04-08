@@ -1,12 +1,11 @@
 import LocationForm from '@/components/LocationForm/LocationForm';
+import css from "./page.module.css";
 
 export default function CreateLocationPage() {
   return (
-    <section className="section">
       <div className="container">
-        <h1>Додавання нового місця</h1>
+        <h1 className={css.title}>Додавання нового місця</h1>
         <LocationForm mode="create" />
       </div>
-    </section>
   );
 }
