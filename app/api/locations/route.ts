@@ -4,6 +4,7 @@ import { api, ApiError } from '../api';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
+
 const rebuildFormData = (incomingFormData: FormData) => {
   const outgoingFormData = new FormData();
 
