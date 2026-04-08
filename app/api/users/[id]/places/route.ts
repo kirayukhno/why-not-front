@@ -1,7 +1,7 @@
 // app/api/users/[id]/places/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import { api, APIError } from "../../../api";
+import { api, ApiError } from "../../../api";
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest, { params }: Props) {
 
     return NextResponse.json(data, { status });
   } catch (error) {
-    const err = error as APIError;
+    const err = error as ApiError;
     console.error("Error fetching user locations:", err.response?.data ?? err.message);
 
     return NextResponse.json(
