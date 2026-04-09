@@ -54,8 +54,7 @@ export default function LocationsPageClient() {
 
         setRegions(regionsData || []);
         setTypes(typesData || []);
-      } catch (error) {
-        console.error("Failed to fetch filter data:", error);
+      } catch {
       }
     };
 
@@ -80,8 +79,7 @@ export default function LocationsPageClient() {
 
         setLocations(data.items);
         setHasNextPage(Boolean(data.hasNextPage));
-      } catch (error) {
-        console.error("Failed to fetch locations:", error);
+      } catch {
         setLocations([]);
         setHasNextPage(false);
       } finally {
@@ -130,8 +128,7 @@ export default function LocationsPageClient() {
       setCurrentPage(nextPage);
       setHasNextPage(Boolean(data.hasNextPage));
       setScrollTargetIndex(nextBatchStartIndex);
-    } catch (error) {
-      console.error("Failed to load more locations:", error);
+    } catch {
     } finally {
       setIsLoadingMore(false);
     }

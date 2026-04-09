@@ -2,9 +2,22 @@
 import { cookies } from 'next/headers';
 import { api, ApiError } from '../api';
 
-export async function GET() {
+type FeedbackListResponse = {
+  feedbacks?: unknown[];
+  data?: {
+    feedbacks?: unknown[];
+  };
+};
+
+export async function GET(req: NextRequest) {
   try {
-    const { data, status } = await api.get('/feedback');
+    const locationId = req.nextUrl.searchParams.get('locationId');
+    const endpoint = locationId
+      ? `/feedback/locations/${locationId}/feedbacks`
+      : '/feedback';
+    const { data, status } = await api.get<FeedbackListResponse>(endpoint, {
+      params: locationId ? undefined : { page: 1, perPage: 10 },
+    });
     return NextResponse.json(data, { status });
   } catch (error) {
     const err = error as ApiError;
@@ -17,6 +30,16 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
+  const hasSessionToken =
+    cookieStore.has('accessToken') || cookieStore.has('refreshToken');
+
+  if (!hasSessionToken) {
+    return NextResponse.json(
+      { error: 'Unauthorized', message: 'Потрібно увійти, щоб залишити відгук' },
+      { status: 401 },
+    );
+  }
+
   const cookieHeader = cookieStore
     .getAll()
     .map((cookie) => `${cookie.name}=${cookie.value}`)
@@ -35,13 +58,12 @@ export async function POST(req: NextRequest) {
       throw new Error('Location id is required');
     }
 
-    const response = await api.post(
-      `/feedback/locations/${locationId}/feedbacks`,
-      payload,
-      {
-        headers: { Cookie: cookieHeader },
-      },
-    );
+    const response = await api.post('/feedback', {
+      ...payload,
+      locationId,
+    }, {
+      headers: { Cookie: cookieHeader },
+    });
 
     return NextResponse.json(response.data, { status: response.status });
   } catch (error) {

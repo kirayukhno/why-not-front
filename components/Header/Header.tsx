@@ -11,7 +11,7 @@ export default function Header() {
   const { isAuthenticated, user} = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
-//console.log("Header user:", user);
+
   return (
     <header className={styles.header}>
       <div className={styles.container}>
@@ -86,7 +86,7 @@ export default function Header() {
 
           {isAuthenticated && (
             <>
-              <Link href="/profile" onClick={() => setIsOpen(false)}>
+              <Link href={`/profile/${user?.id}`} onClick={() => setIsOpen(false)}>
                 Профіль
               </Link>
               <Link href="/locations/add" className={styles.register} onClick={() => setIsOpen(false)}>

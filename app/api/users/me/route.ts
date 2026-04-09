@@ -4,6 +4,13 @@ import { api, ApiError } from "../../api";
 
 export async function GET() {
   const cookieStore = await cookies();
+  const hasSessionToken =
+    cookieStore.has("accessToken") || cookieStore.has("refreshToken");
+
+  if (!hasSessionToken) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const cookieHeader = cookieStore
     .getAll()
     .map((current) => `${current.name}=${current.value}`)
@@ -26,6 +33,13 @@ export async function GET() {
 
 export async function PATCH(req: NextRequest) {
   const cookieStore = await cookies();
+  const hasSessionToken =
+    cookieStore.has("accessToken") || cookieStore.has("refreshToken");
+
+  if (!hasSessionToken) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const cookieHeader = cookieStore
     .getAll()
     .map((current) => `${current.name}=${current.value}`)
@@ -54,4 +68,3 @@ export async function PATCH(req: NextRequest) {
     );
   }
 }
-

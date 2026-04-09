@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import type { FormikHelpers } from "formik";
 import { useQueryClient } from "@tanstack/react-query";
@@ -30,6 +31,13 @@ export default function LoginForm() {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("from");
+  const isJustRegistered = searchParams.get("registered") === "1";
+
+  useEffect(() => {
+    if (isJustRegistered) {
+      toast.success("Реєстрацію завершено. Тепер увійдіть у свій акаунт.");
+    }
+  }, [isJustRegistered]);
 
   const handleSubmit = async (
     values: LoginData,
@@ -44,8 +52,8 @@ export default function LoginForm() {
       }
 
       toast.success('Успішний вхід!');
-      await queryClient.invalidateQueries({ queryKey: ["currentUser"] });
-      await queryClient.refetchQueries({ queryKey: ["currentUser"] });
+      await queryClient.invalidateQueries({ queryKey: ["authSession"] });
+      await queryClient.refetchQueries({ queryKey: ["authSession"] });
       const nextPath = redirectTo || `/profile/${userId}`;
       router.replace(nextPath);
       router.refresh();
@@ -64,6 +72,11 @@ export default function LoginForm() {
       {({ isSubmitting }) => (
         <Form className={styles.form} noValidate>
           <h1 className={styles.title}>Вхід</h1>
+          {isJustRegistered ? (
+            <p className={styles.helperText}>
+              Акаунт створено. Увійдіть, щоб продовжити.
+            </p>
+          ) : null}
 
           <div className={styles.field}>
             <label className={styles.label} htmlFor="email">

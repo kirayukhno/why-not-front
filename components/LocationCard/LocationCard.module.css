@@ -2,7 +2,11 @@
   overflow: hidden;
   border-radius: 16px;
   background-color: #ffe5d9;
-  width: 335px;
+  width: 100%;
+  max-width: 421px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
 }
 
 .imagePlaceholder {
@@ -16,11 +20,18 @@
   font-size: 14px;
 }
 
+.image {
+  width: 100%;
+  height: 197px;
+  object-fit: cover;
+}
+
 .content {
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 8px;
+  flex: 1;
 }
 
 .typeText {
@@ -40,28 +51,31 @@
   font-weight: 700;
   line-height: 1.2;
   color: #4c2613;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: calc(1.2em * 2);
 }
 
 .button {
   width: 100%;
   min-height: 40px;
   font-size: 14px;
+  margin-top: auto;
 }
 
 @media screen and (min-width: 768px) {
-  .imagePlaceholder {
+  .image {
     height: 245px;
   }
-  .card {
-    width: 340px;
+
+  .imagePlaceholder {
+    height: 245px;
   }
 
   .title {
     font-size: 20px;
-  }
-}
-@media screen and (min-width: 1440px) {
-  .card {
-    width: 421px;
+    min-height: calc(1.2em * 2);
   }
 }

@@ -129,8 +129,7 @@ const normalizeLocationDetails = async (
     try {
       const userRes = await api.get(`/users/${ownerId}`);
       authorName = userRes.data?.data?.name ?? userRes.data?.name ?? '';
-    } catch (error) {
-      console.error(`Server API Error (author lookup ${ownerId}):`, error);
+    } catch {
     }
   }
 
@@ -190,26 +189,13 @@ const normalizeLocationDetails = async (
 export const getFeedbacks = async () => {
   try {
     const res = await api.get('/feedback', {
-      params: { perPage: 10 },
+      params: { page: 1, perPage: 10 },
     });
 
     const feedbacks = await normalizeFeedbacks(res.data);
 
-    if (feedbacks.length > 0) {
-      return feedbacks;
-    }
-  } catch (error) {
-    console.error('Server API Error (getFeedbacks primary):', error);
-  }
-
-  try {
-    const fallbackRes = await api.get('/feedbacks', {
-      params: { perPage: 10 },
-    });
-
-    return await normalizeFeedbacks(fallbackRes.data);
-  } catch (error) {
-    console.error('Server API Error (getFeedbacks fallback):', error);
+    return feedbacks;
+  } catch {
     return [];
   }
 };
@@ -286,14 +272,18 @@ export const serverUserService = {
     try {
       const cookieStore = await cookies();
       const allCookies = cookieStore.getAll();
+
+      if (allCookies.length === 0) {
+        return null;
+      }
+
       const cookieHeader = allCookies.map((c) => `${c.name}=${c.value}`).join('; ');
 
       const res = await api.get('/users/current', {
         headers: { Cookie: cookieHeader },
       });
       return res.data;
-    } catch (error) {
-      console.error('Server API Error (getCurrentUser):', error);
+    } catch {
       return null;
     }
   },
@@ -301,8 +291,7 @@ export const serverUserService = {
     try {
       const res = await api.get(`/users/${userId}`);
       return res.data;
-    } catch (error) {
-      console.error(`Server API Error (getUserById ${userId}):`, error);
+    } catch {
       return null;
     }
   },
@@ -314,8 +303,7 @@ export const serverUserService = {
       if (Array.isArray(items) && items.length > 0) {
         return res.data;
       }
-    } catch (error) {
-      console.error(`Server API Error (getUserLocations primary ${userId}):`, error);
+    } catch {
     }
 
     try {
@@ -325,8 +313,7 @@ export const serverUserService = {
       if (Array.isArray(items) && items.length > 0) {
         return fallbackRes.data;
       }
-    } catch (error) {
-      console.error(`Server API Error (getUserLocations fallback ${userId}):`, error);
+    } catch {
     }
 
     try {
@@ -356,8 +343,7 @@ export const serverUserService = {
           limit: filteredLocations.length || 0,
         },
       };
-    } catch (error) {
-      console.error(`Server API Error (getUserLocations local filter ${userId}):`, error);
+    } catch {
       return { data: { data: [], totalItems: 0 } };
     }
   },

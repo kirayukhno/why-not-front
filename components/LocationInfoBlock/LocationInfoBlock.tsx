@@ -8,6 +8,8 @@ type LocationInfoBlockProps = {
   type: string;
   authorId: string;
   authorName: string;
+  locationId?: string;
+  canEdit?: boolean;
   className?: string;
 };
 
@@ -18,6 +20,8 @@ export const LocationInfoBlock = ({
   type,
   authorId,
   authorName,
+  locationId,
+  canEdit = false,
   className,
 }: LocationInfoBlockProps) => {
   const hasRating = typeof rating === "number" && !Number.isNaN(rating);
@@ -88,6 +92,14 @@ export const LocationInfoBlock = ({
             )}
           </div>
         </div>
+        {canEdit && locationId ? (
+          <Link
+            href={`/locations/${locationId}/edit`}
+            className={`secondary-btn ${styles.editButton}`}
+          >
+            Редагувати
+          </Link>
+        ) : null}
       </div>
   );
 };

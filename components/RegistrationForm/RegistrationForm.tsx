@@ -2,10 +2,11 @@
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import type { FormikHelpers } from "formik";
+import { useQueryClient } from "@tanstack/react-query";
 import * as Yup from "yup";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
-import { register, type RegisterData } from "@/lib/api/clientApi";
+import { register, type RegisterData, clientUserService } from "@/lib/api/clientApi";
 import styles from "./RegistrationForm.module.css";
 
 const initialValues: RegisterData = {
@@ -31,6 +32,7 @@ const validationSchema = Yup.object({
 
 export default function RegistrationForm() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("from") ?? "/";
 
@@ -40,7 +42,17 @@ export default function RegistrationForm() {
   ) => {
     try {
       await register(values);
-      router.push(redirectTo);
+      await queryClient.invalidateQueries({ queryKey: ["authSession"] });
+      const user = await clientUserService.getCurrentUser();
+
+      if (user?.id || user?._id) {
+        toast.success("Реєстрація успішна");
+        router.push(redirectTo);
+        router.refresh();
+      } else {
+        toast.success("Реєстрація успішна. Увійдіть у свій акаунт.");
+        router.push(`/sign-in?registered=1&from=${encodeURIComponent(redirectTo)}`);
+      }
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Помилка реєстрації",

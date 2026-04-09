@@ -34,6 +34,7 @@ export interface Location {
   regionName?: string;
   images?: string[];
   rating?: number;
+  ownerId?: string;
 }
 
 export interface LocationsResponse {
@@ -63,4 +64,3 @@ export interface FeedbacksResponse {
   totalFeedbacks: number;
   feedbacks: Feedback[];
 }
-

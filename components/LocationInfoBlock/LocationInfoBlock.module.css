@@ -4,6 +4,8 @@
   gap: 12px;
   padding: 9px 0px;
   color: #1b391b;
+  width: 100%;
+  min-width: 0;
 }
 
 .ratingRow {
@@ -49,6 +51,7 @@
 
 .metaItem {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
 }
 
@@ -70,6 +73,12 @@
   text-decoration: underline;
   text-decoration-skip-ink: none;
   color: inherit;
+}
+
+.editButton {
+  width: fit-content;
+  min-height: 44px;
+  margin-top: 8px;
 }
 
 @media screen and (min-width: 768px) {

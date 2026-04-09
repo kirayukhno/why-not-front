@@ -67,7 +67,7 @@ function StarIcon({ variant }: StarIconProps) {
 }
 
 async function createReview(payload: CreateReviewPayload): Promise<CreateReviewResponse> {
-  const response = await fetch('/api/feedbacks', {
+  const response = await fetch('/api/feedback', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -95,7 +95,11 @@ export default function AddReviewForm({ locationId, onCancel, onSuccess }: AddRe
     values: ReviewFormValues,
     actions: FormikHelpers<ReviewFormValues>,
   ): Promise<void> => {
-    if (!user) return;
+    if (!user) {
+      setServerError('Потрібно увійти, щоб залишити відгук.');
+      actions.setSubmitting(false);
+      return;
+    }
 
     setServerError('');
 

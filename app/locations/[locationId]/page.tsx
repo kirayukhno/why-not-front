@@ -37,9 +37,10 @@ export async function generateMetadata({ params }: ToolDetailsPageProps): Promis
 
 export default async function ToolDetailsPage({ params }: ToolDetailsPageProps) {
   const { locationId } = await params;
-  const [locationData, feedbacks] = await Promise.all([
+  const [locationData, feedbacks, currentUser] = await Promise.all([
     getLocationById(locationId),
     getLocationFeedbacks(locationId),
+    serverUserService.getCurrentUser(),
   ]);
 
   if (!locationData) {
@@ -109,27 +110,40 @@ export default async function ToolDetailsPage({ params }: ToolDetailsPageProps) 
   const type = findTypeLabel(rawType);
   const image = getString(rawLocation.image);
   const description = getString(rawLocation.description, 'Опис відсутній.');
+  const currentUserId =
+    getString(currentUser?.data?.id) ||
+    getString(currentUser?.data?._id) ||
+    getString(currentUser?.id) ||
+    getString(currentUser?._id);
+  const canEdit = Boolean(authorId && currentUserId && authorId === currentUserId);
 
   return (
-    <div className="container">
-      <div className={css.details}>
-        <div className={css.image}>
-          <LocationGallery imageSrc={image} imageAlt={title} />
+    <section className={css.page}>
+      <div className="container">
+        <div className={css.details}>
+          <div className={css.image}>
+            <LocationGallery imageSrc={image} imageAlt={title} />
+          </div>
+          <div className={css.location}>
+            <LocationInfoBlock
+              title={title}
+              rating={rating}
+              region={region}
+              type={type}
+              authorId={authorId}
+              authorName={authorName}
+              locationId={locationId}
+              canEdit={canEdit}
+            />
+          </div>
         </div>
-        <div className={css.location}>
-          <LocationInfoBlock
-            title={title}
-            rating={rating}
-            region={region}
-            type={type}
-            authorId={authorId}
-            authorName={authorName}
-          />
+        <div className={css.description}>
+          <LocationDescription text={description} />
         </div>
-
+        <div className={css.reviews}>
+          <ReviewsSection locationId={locationId} feedbacks={resolvedFeedbacks} />
+        </div>
       </div>
-      <LocationDescription text={description} />
-      <ReviewsSection locationId={locationId} feedbacks={resolvedFeedbacks} />
-    </div>
+    </section>
   );
 }

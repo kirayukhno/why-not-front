@@ -43,10 +43,14 @@
 .slide {
   display: flex;
   justify-content: center;
+  height: auto;
+  align-self: stretch;
 }
 
 .locationCard {
   width: 100%;
+  height: 100%;
+  min-height: 100%;
   border-radius: 12px;
   overflow: hidden;
   background-color: #ffe5d9;
@@ -69,11 +73,22 @@
   display: block;
 }
 
+.cardImagePlaceholder {
+  width: 100%;
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0d7cb;
+  color: rgba(0, 0, 0, 0.45);
+}
+
 .cardContent {
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex: 1;
 }
 
 .category {
@@ -109,6 +124,12 @@
   line-height: 150%;
   color: #0d0b0a;
   margin: 0;
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  min-height: calc(1.5em * 2);
 }
 
 .cardButton {
@@ -125,7 +146,7 @@
     background-color 250ms cubic-bezier(0.4, 0, 0.2, 1),
     border 250ms cubic-bezier(0.4, 0, 0.2, 1),
     color 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  margin-top: 8px;
+  margin-top: auto;
 }
 
 .cardButton:hover {
@@ -183,6 +204,10 @@
   .cardImage {
     height: 280px;
   }
+
+  .cardImagePlaceholder {
+    height: 280px;
+  }
 }
 
 @media (min-width: 768px) {
@@ -191,6 +216,10 @@
   }
 
   .cardImage {
+    height: 240px;
+  }
+
+  .cardImagePlaceholder {
     height: 240px;
   }
 
@@ -227,6 +256,10 @@
   }
 
   .cardImage {
+    height: 280px;
+  }
+
+  .cardImagePlaceholder {
     height: 280px;
   }
 

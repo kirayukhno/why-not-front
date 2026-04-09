@@ -1,12 +1,18 @@
 .header {
   border-bottom: 1px solid #E4E7EC;
   background: #FFF2EC;
+  width: 100%;
+  overflow-x: clip;
 }
 
 .container {
+  width: 100%;
+  max-width: 1440px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
+  margin: 0 auto;
   padding: 12px 16px;
 }
 
@@ -23,6 +29,7 @@
 }
 .nav {
   display: none;
+  min-width: 0;
 }
 .mainlocations {
   display: none; 
@@ -211,13 +218,13 @@
 /* ***************************************** tablet */
 @media (min-width: 768px) {
   .nav {
-    display: flex;
-    gap: 24px;
-    margin-left: auto;
+    display: none;
   }
-.mainlocations {
-  display: none; 
-}
+
+  .mainlocations {
+    display: none; 
+  }
+
   .right {
     display: flex;
   }
@@ -225,31 +232,38 @@
   .burger {
     display: flex;
   }
- 
-
   .userBlock {
-  display: none;
-}
+    display: none;
+  }
 
 }
 
 /* ***************************************** desktop */
 @media (min-width: 1440px) {
   .container {
-    max-width: 1440px;
-    margin: 0 auto;
+    padding: 12px 64px;
   }
+
+  .nav {
+    display: flex;
+    gap: 24px;
+    margin-left: auto;
+    align-items: center;
+  }
+
   .mainlocations {
-  display: flex; 
-}
- .userBlock {
-  display: flex;
-}
-.burger {
-    display: none;
+    display: flex; 
   }
-  .mobileMenu {
+
+  .userBlock {
+    display: flex;
+  }
+
+  .burger {
     display: none;
   }
 
+  .mobileMenu {
+    display: none;
+  }
 }

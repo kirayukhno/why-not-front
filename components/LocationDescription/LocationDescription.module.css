@@ -2,6 +2,10 @@
   display: grid;
   gap: 16px;
   margin: 0 auto;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .text {
@@ -10,17 +14,23 @@
   line-height: 150%;
   color: var(--coral-darkest);
   white-space: pre-line;
+  max-width: 100%;
 }
 
 @media screen and (min-width: 768px) {
   .locationDescription {
-    width: 865px;
+    width: 100%;
   }
   .text {
     font-size: 16px;
   }
 }
 
+@media screen and (min-width: 1440px) {
+  .locationDescription {
+    max-width: 865px;
+  }
+}
 @media screen and (min-width: 1440px) {
   .text {
     font-size: 18px;

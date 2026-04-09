@@ -40,6 +40,21 @@ let regionsCache: Region[] | null = null;
 let locationTypesCache: LocationType[] | null = null;
 let categoriesPromise: Promise<void> | null = null;
 
+const isValidImageUrl = (value: unknown) =>
+  typeof value === 'string' &&
+  !!value.trim() &&
+  (value.startsWith('http://') ||
+    value.startsWith('https://') ||
+    value.startsWith('data:image/'));
+
+const toImageSrc = (value: unknown) => {
+  if (typeof value !== 'string' || !value.trim()) {
+    return '';
+  }
+
+  return isValidImageUrl(value) ? value : `data:image/jpeg;base64,${value}`;
+};
+
 const extractRegions = (payload: unknown): Region[] => {
   const data = payload as
     | {
@@ -151,13 +166,17 @@ const normalizeLocation = (location: Record<string, unknown>): Location => ({
         ? location.locationType
         : (location.type as LocationType | string),
   image:
-    typeof location.image === 'string'
-      ? location.image
-      : Array.isArray(location.images) && typeof location.images[0] === 'string'
-        ? location.images[0]
-        : undefined,
+    toImageSrc(
+      typeof location.image === 'string'
+        ? location.image
+        : Array.isArray(location.images) && typeof location.images[0] === 'string'
+          ? location.images[0]
+          : '',
+    ) || undefined,
   images: Array.isArray(location.images)
-    ? location.images.filter((item): item is string => typeof item === 'string')
+    ? location.images
+        .filter((item): item is string => typeof item === 'string')
+        .map((item) => toImageSrc(item))
     : undefined,
   rate: Number(location.rate ?? location.rating ?? 0),
   rating: Number(location.rating ?? location.rate ?? 0),
@@ -294,19 +313,23 @@ export async function login(data: LoginData) {
 }
 
 export const getLocationFeedbacks = async (locationId: string): Promise<Feedback[]> => {
-  const res = await api.get<FeedbacksResponse>(
-    `/feedback/locations/${locationId}/feedbacks`,
+  const res = await nextServer.get<
+    FeedbacksResponse & { data?: { feedbacks?: Feedback[] } }
+  >(
+    `/api/feedback`,
+    {
+      params: { locationId },
+    },
   );
-  return res.data?.feedbacks ?? [];
+  return res.data.feedbacks ?? res.data.data?.feedbacks ?? [];
 };
 
 export const clientUserService = {
   getCurrentUser: async () => {
     try {
-      const res = await nextServer.get('/api/users/me');
-      return res.data;
-    } catch (error) {
-      console.error('Client API Error (getCurrentUser):', error);
+      const res = await nextServer.get('/api/auth/session');
+      return res.data?.user ?? null;
+    } catch {
       return null;
     }
   },
@@ -314,8 +337,7 @@ export const clientUserService = {
     try {
       const res = await api.get(`/users/${userId}`);
       return res.data;
-    } catch (error) {
-      console.error(`Client API Error (getUserById ${userId}):`, error);
+    } catch {
       return null;
     }
   },
@@ -327,8 +349,7 @@ export const clientUserService = {
       if (Array.isArray(items) && items.length > 0) {
         return res.data;
       }
-    } catch (error) {
-      console.error(`Client API Error (getUserLocations primary ${userId}):`, error);
+    } catch {
     }
 
     try {
@@ -338,8 +359,7 @@ export const clientUserService = {
       if (Array.isArray(items) && items.length > 0) {
         return fallbackRes.data;
       }
-    } catch (error) {
-      console.error(`Client API Error (getUserLocations fallback ${userId}):`, error);
+    } catch {
     }
 
     try {
@@ -369,8 +389,7 @@ export const clientUserService = {
           limit: filteredLocations.length || 0,
         },
       };
-    } catch (error) {
-      console.error(`Client API Error (getUserLocations local filter ${userId}):`, error);
+    } catch {
       return { data: { data: [], totalItems: 0 } };
     }
   },
