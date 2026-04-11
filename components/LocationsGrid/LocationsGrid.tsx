@@ -9,6 +9,7 @@ type LocationsGridProps = {
   hasNextPage: boolean;
   scrollTargetIndex?: number | null;
   onLoadMore: () => void;
+  showEditButton?: boolean;
 };
 
 export default function LocationsGrid({
@@ -18,6 +19,7 @@ export default function LocationsGrid({
   hasNextPage,
   scrollTargetIndex = null,
   onLoadMore,
+  showEditButton = false,
 }: LocationsGridProps) {
   if (isLoading) {
     return <p className={css.loading}>Завантаження...</p>;
@@ -37,7 +39,7 @@ export default function LocationsGrid({
               scrollTargetIndex === index ? String(index) : undefined
             }
           >
-            <LocationCard location={location} />
+            <LocationCard location={location} showEditButton={showEditButton} />
           </div>
         ))}
       </div>

@@ -7,11 +7,13 @@ import AddReviewForm from '../AddReviewForm/AddReviewForm';
 interface AddReviewModalProps {
   locationId: string;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
 export default function AddReviewModal({
   locationId,
   onClose,
+  onSuccess,
 }: AddReviewModalProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -60,7 +62,7 @@ export default function AddReviewModal({
         <AddReviewForm
           locationId={locationId}
           onCancel={onClose}
-          onSuccess={onClose}
+          onSuccess={onSuccess ?? onClose}
         />
       </div>
     </div>

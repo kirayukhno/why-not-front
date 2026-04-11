@@ -3,7 +3,6 @@
   border-radius: 16px;
   background-color: #ffe5d9;
   width: 100%;
-  max-width: 421px;
   display: flex;
   flex-direction: column;
   min-height: 100%;
@@ -14,15 +13,19 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  height: 197px;
+  aspect-ratio: 1 / 1;
   background-color: #f0d7cb;
   color: rgba(0, 0, 0, 0.45);
   font-size: 14px;
 }
 
-.image {
+.imageWrapper {
+  position: relative;
   width: 100%;
-  height: 197px;
+  aspect-ratio: 1 / 1;
+}
+
+.image {
   object-fit: cover;
 }
 
@@ -38,6 +41,11 @@
   font-size: 12px;
   line-height: 1.5;
   color: #0d0b0a;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  min-height: 1.5em;
 }
 
 .rating {
@@ -62,18 +70,23 @@
   width: 100%;
   min-height: 40px;
   font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
   margin-top: auto;
 }
 
+.editButton {
+  width: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0;
+}
+
 @media screen and (min-width: 768px) {
-  .image {
-    height: 245px;
-  }
-
-  .imagePlaceholder {
-    height: 245px;
-  }
-
   .title {
     font-size: 20px;
     min-height: calc(1.2em * 2);

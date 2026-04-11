@@ -53,10 +53,10 @@ export default function Header() {
             </>
           ) : (
             <>
-              <Link href="/sign-in" className={styles.login}>
+              <Link href="/login" className={styles.login}>
                 Вхід
               </Link>
-              <Link href="/sign-up" className={styles.register}>
+              <Link href="/register" className={styles.register}>
                 Реєстрація
               </Link>
             </>
@@ -107,10 +107,10 @@ export default function Header() {
 
           {!isAuthenticated && (
             <>
-              <Link href="/sign-in" className={styles.login} onClick={() => setIsOpen(false)}>
+              <Link href="/login" className={styles.login} onClick={() => setIsOpen(false)}>
                 Вхід
               </Link>
-              <Link href="/sign-up" className={styles.register} onClick={() => setIsOpen(false)}>
+              <Link href="/register" className={styles.register} onClick={() => setIsOpen(false)}>
                 Реєстрація
               </Link>
             </>

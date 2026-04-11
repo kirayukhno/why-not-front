@@ -105,14 +105,16 @@ export default function PopularLocations() {
               <SwiperSlide key={location._id} className={css.slide}>
                 <div className={css.locationCard}>
                   {location.image ? (
-                    <Image
-                      src={location.image}
-                      alt={location.name}
-                      width={420}
-                      height={280}
-                      className={css.cardImage}
-                      unoptimized={location.image.startsWith("data:image/")}
-                    />
+                    <div className={css.cardImageWrapper}>
+                      <Image
+                        src={location.image}
+                        alt={location.name}
+                        fill
+                        sizes="(min-width: 1440px) calc((100vw - 128px - 64px) / 3), (min-width: 768px) calc((100vw - 64px - 24px) / 2), 100vw"
+                        className={css.cardImage}
+                        unoptimized={location.image.startsWith("data:image/")}
+                      />
+                    </div>
                   ) : (
                     <div className={css.cardImagePlaceholder}>Без зображення</div>
                   )}

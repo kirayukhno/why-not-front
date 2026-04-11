@@ -10,6 +10,10 @@ interface PageProps {
   params: Promise<{ userId: string }>;
 }
 
+const API_ORIGIN = process.env.NEXT_PUBLIC_API_URL
+  ? new URL(process.env.NEXT_PUBLIC_API_URL).origin
+  : '';
+
 const isRegionLike = (value: unknown): value is Region =>
   !!value &&
   typeof value === 'object' &&
@@ -24,6 +28,12 @@ const isLocationTypeLike = (value: unknown): value is LocationType =>
   'type' in value &&
   'slug' in value;
 
+const looksLikeBase64 = (value: string) =>
+  /^[A-Za-z0-9+/=\s]+$/.test(value) &&
+  !value.includes('\\') &&
+  !value.includes('.') &&
+  value.length > 32;
+
 const toDataImage = (value?: string) => {
   if (!value) {
     return '';
@@ -33,7 +43,48 @@ const toDataImage = (value?: string) => {
     return value;
   }
 
-  return `data:image/jpeg;base64,${value}`;
+  if (looksLikeBase64(value)) {
+    return `data:image/jpeg;base64,${value}`;
+  }
+
+  if (API_ORIGIN && (value.startsWith('/') || value.includes('/'))) {
+    try {
+      return new URL(value, API_ORIGIN).toString();
+    } catch {
+    }
+  }
+  return value;
+};
+
+const extractImageCandidate = (value: unknown): string => {
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const extracted = extractImageCandidate(item);
+
+      if (extracted) {
+        return extracted;
+      }
+    }
+  }
+
+  if (value && typeof value === 'object') {
+    const imageObject = value as Record<string, unknown>;
+    const candidateFields = ['url', 'secure_url', 'path', 'src', 'imageUrl'];
+
+    for (const field of candidateFields) {
+      const fieldValue = imageObject[field];
+
+      if (typeof fieldValue === 'string' && fieldValue.trim()) {
+        return fieldValue;
+      }
+    }
+  }
+
+  return '';
 };
 
 const extractList = <T,>(payload: unknown): T[] => {
@@ -203,10 +254,8 @@ export default async function ProfilePage({ params }: PageProps) {
           : '');
 
       const rawImage =
-        (typeof location.image === 'string' ? location.image : null) ||
-        (Array.isArray(location.images) && typeof location.images[0] === 'string'
-          ? location.images[0]
-          : '');
+        extractImageCandidate(location.image) ||
+        extractImageCandidate(location.images);
 
       const normalizedRegionName = rawRegion ? findRegionLabel(rawRegion, regions) : '';
       const normalizedTypeName = rawType ? findTypeLabel(rawType, types) : '';
@@ -240,7 +289,9 @@ export default async function ProfilePage({ params }: PageProps) {
         type: resolvedType,
         image: String(details?.image || toDataImage(rawImage)),
         images: Array.isArray(location.images)
-          ? location.images.filter((item): item is string => typeof item === 'string')
+          ? location.images
+              .map((item) => extractImageCandidate(item))
+              .filter((item): item is string => Boolean(item))
           : undefined,
         rate: Number(location.rate ?? location.rating ?? details?.rate ?? details?.rating ?? 0),
         rating: Number(

@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import ReviewsBlock from '../ReviewsBlock/ReviewsBlock';
 import AuthPromptModal from '../AuthPromptModal/AuthPromptModal';
@@ -21,6 +22,7 @@ export default function ReviewsSection({
   locationId,
   feedbacks,
 }: ReviewsSectionProps) {
+  const router = useRouter();
   const locationFeedback: ReviewCardData[] = feedbacks.map((feedback) => ({
     _id: feedback._id,
     id: feedback._id,
@@ -34,6 +36,12 @@ export default function ReviewsSection({
   const { isAuthenticated } = useAuth();
   const [isAuthPromptOpen, setIsAuthPromptOpen] = useState(false);
   const [isAddReviewOpen, setIsAddReviewOpen] = useState(false);
+
+  const handleReviewCreated = () => {
+    setIsAddReviewOpen(false);
+    router.refresh();
+  };
+
   const handleAddReviewClick = () => {
     if (!isAuthenticated) {
       setIsAuthPromptOpen(true);
@@ -52,7 +60,13 @@ export default function ReviewsSection({
       </div>
       <ReviewsBlock reviews={locationFeedback} />
       {isAuthPromptOpen && <AuthPromptModal onClose={() => setIsAuthPromptOpen(false)} />}
-      {isAddReviewOpen && <AddReviewModal onClose={() => setIsAddReviewOpen(false)} locationId={locationId} />}
+      {isAddReviewOpen && (
+        <AddReviewModal
+          onClose={() => setIsAddReviewOpen(false)}
+          onSuccess={handleReviewCreated}
+          locationId={locationId}
+        />
+      )}
     </section>
   );
 }

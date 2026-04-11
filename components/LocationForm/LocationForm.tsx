@@ -131,6 +131,26 @@ function PlaceholderIcon() {
   );
 }
 
+const imageSourceToFile = async (imageSrc: string, filename: string) => {
+  const response = await fetch(imageSrc);
+
+  if (!response.ok) {
+    throw new Error('Не вдалося підготувати поточне зображення');
+  }
+
+  const blob = await response.blob();
+  const extension =
+    blob.type === 'image/png'
+      ? 'png'
+      : blob.type === 'image/webp'
+        ? 'webp'
+        : 'jpg';
+
+  return new File([blob], `${filename}.${extension}`, {
+    type: blob.type || 'image/jpeg',
+  });
+};
+
 export default function LocationForm({
   mode = 'create',
   locationId,
@@ -183,6 +203,12 @@ export default function LocationForm({
 
       if (values.image) {
         formData.append('images', values.image);
+      } else if (mode === 'edit' && initialData?.image) {
+        const currentImageFile = await imageSourceToFile(
+          initialData.image,
+          `location-${locationId || initialData._id || 'image'}`,
+        );
+        formData.append('images', currentImageFile);
       }
 
       const data =
@@ -192,11 +218,12 @@ export default function LocationForm({
 
       toast.success(
         mode === 'edit'
-          ? 'Локацію успішно оновлено'
+          ? 'Локацію успішно відредаговано'
           : 'Локацію успішно створено',
       );
 
       router.push(`/locations/${data.data._id}`);
+      router.refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Сталася помилка');
     } finally {

@@ -36,6 +36,7 @@ export default function ProfilePageContent({
             isLoadingMore={false}
             hasNextPage={hasMore}
             onLoadMore={() => {}}
+            showEditButton={isOwner}
           />
         ) : (
           <ProfilePlaceholder isOwner={isOwner} />

@@ -39,6 +39,9 @@ export interface FetchLocationsParams {
 let regionsCache: Region[] | null = null;
 let locationTypesCache: LocationType[] | null = null;
 let categoriesPromise: Promise<void> | null = null;
+const API_ORIGIN = process.env.NEXT_PUBLIC_API_URL
+  ? new URL(process.env.NEXT_PUBLIC_API_URL).origin
+  : '';
 
 const isValidImageUrl = (value: unknown) =>
   typeof value === 'string' &&
@@ -47,12 +50,89 @@ const isValidImageUrl = (value: unknown) =>
     value.startsWith('https://') ||
     value.startsWith('data:image/'));
 
-const toImageSrc = (value: unknown) => {
-  if (typeof value !== 'string' || !value.trim()) {
+const looksLikeBase64 = (value: string) =>
+  /^[A-Za-z0-9+/=\s]+$/.test(value) &&
+  !value.includes('\\') &&
+  !value.includes('.') &&
+  value.length > 32;
+
+const resolveImageUrl = (value: string) => {
+  const normalizedValue = value.trim();
+
+  if (!normalizedValue) {
     return '';
   }
 
-  return isValidImageUrl(value) ? value : `data:image/jpeg;base64,${value}`;
+  if (isValidImageUrl(normalizedValue)) {
+    return normalizedValue;
+  }
+
+  if (looksLikeBase64(normalizedValue)) {
+    return `data:image/jpeg;base64,${normalizedValue}`;
+  }
+
+  if (normalizedValue.startsWith('/')) {
+    if (!API_ORIGIN) {
+      return normalizedValue;
+    }
+
+    try {
+      return new URL(normalizedValue, API_ORIGIN).toString();
+    } catch {
+      return normalizedValue;
+    }
+  }
+
+  if (!API_ORIGIN) {
+    return normalizedValue;
+  }
+
+  try {
+    return new URL(normalizedValue, API_ORIGIN).toString();
+  } catch {
+    return normalizedValue;
+  }
+};
+
+const extractImageCandidate = (value: unknown): string => {
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const extracted = extractImageCandidate(item);
+
+      if (extracted) {
+        return extracted;
+      }
+    }
+  }
+
+  if (value && typeof value === 'object') {
+    const imageObject = value as Record<string, unknown>;
+    const candidateFields = ['url', 'secure_url', 'path', 'src', 'imageUrl'];
+
+    for (const field of candidateFields) {
+      const fieldValue = imageObject[field];
+
+      if (typeof fieldValue === 'string' && fieldValue.trim()) {
+        return fieldValue;
+      }
+    }
+  }
+
+  return '';
+};
+
+const toImageSrc = (value: unknown) => {
+  const imageValue = extractImageCandidate(value);
+
+  if (!imageValue.trim()) {
+    return '';
+  }
+
+  return resolveImageUrl(imageValue);
 };
 
 const extractRegions = (payload: unknown): Region[] => {
@@ -167,15 +247,16 @@ const normalizeLocation = (location: Record<string, unknown>): Location => ({
         : (location.type as LocationType | string),
   image:
     toImageSrc(
-      typeof location.image === 'string'
+      (typeof location.image === 'string' && location.image.trim()
         ? location.image
-        : Array.isArray(location.images) && typeof location.images[0] === 'string'
-          ? location.images[0]
-          : '',
+        : '') ||
+        (Array.isArray(location.images) ? location.images[0] : '') ||
+        location.images,
     ) || undefined,
   images: Array.isArray(location.images)
     ? location.images
-        .filter((item): item is string => typeof item === 'string')
+        .map((item) => extractImageCandidate(item))
+        .filter((item): item is string => Boolean(item))
         .map((item) => toImageSrc(item))
     : undefined,
   rate: Number(location.rate ?? location.rating ?? 0),
@@ -311,6 +392,18 @@ export async function login(data: LoginData) {
     throw new Error('Помилка входу');
   }
 }
+
+export const createFeedback = async (
+  locationId: string,
+  payload: { description: string; rate: number },
+) => {
+  const res = await nextServer.post('/api/feedback', {
+    locationId,
+    ...payload,
+  });
+
+  return res.data;
+};
 
 export const getLocationFeedbacks = async (locationId: string): Promise<Feedback[]> => {
   const res = await nextServer.get<

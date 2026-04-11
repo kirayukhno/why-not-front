@@ -14,7 +14,7 @@ export default function ProfileRedirectClient() {
     }
 
     if (!isAuthenticated || !user?.id) {
-      router.replace("/sign-in");
+      router.replace("/login");
       return;
     }
 

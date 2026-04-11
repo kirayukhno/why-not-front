@@ -6,6 +6,9 @@ import { findRegionLabel, findTypeLabel } from '@/lib/locationDisplay';
 let regionsCache: Region[] | null = null;
 let locationTypesCache: LocationType[] | null = null;
 let categoriesPromise: Promise<void> | null = null;
+const API_ORIGIN = process.env.NEXT_PUBLIC_API_URL
+  ? new URL(process.env.NEXT_PUBLIC_API_URL).origin
+  : '';
 
 const extractRegions = (payload: unknown): Region[] => {
   const data = payload as
@@ -63,16 +66,89 @@ const isValidImageUrl = (value: unknown) => {
   );
 };
 
-const toImageSrc = (value: unknown) => {
-  if (typeof value !== 'string' || !value.trim()) {
+const looksLikeBase64 = (value: string) =>
+  /^[A-Za-z0-9+/=\s]+$/.test(value) &&
+  !value.includes('\\') &&
+  !value.includes('.') &&
+  value.length > 32;
+
+const resolveImageUrl = (value: string) => {
+  const normalizedValue = value.trim();
+
+  if (!normalizedValue) {
     return '';
   }
 
-  if (isValidImageUrl(value)) {
+  if (isValidImageUrl(normalizedValue)) {
+    return normalizedValue;
+  }
+
+  if (looksLikeBase64(normalizedValue)) {
+    return `data:image/jpeg;base64,${normalizedValue}`;
+  }
+
+  if (normalizedValue.startsWith('/')) {
+    if (!API_ORIGIN) {
+      return normalizedValue;
+    }
+
+    try {
+      return new URL(normalizedValue, API_ORIGIN).toString();
+    } catch {
+      return normalizedValue;
+    }
+  }
+
+  if (!API_ORIGIN) {
+    return normalizedValue;
+  }
+
+  try {
+    return new URL(normalizedValue, API_ORIGIN).toString();
+  } catch {
+    return normalizedValue;
+  }
+};
+
+const extractImageCandidate = (value: unknown): string => {
+  if (typeof value === 'string') {
     return value;
   }
 
-  return `data:image/jpeg;base64,${value}`;
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const extracted = extractImageCandidate(item);
+
+      if (extracted) {
+        return extracted;
+      }
+    }
+  }
+
+  if (value && typeof value === 'object') {
+    const imageObject = value as Record<string, unknown>;
+    const candidateFields = ['url', 'secure_url', 'path', 'src', 'imageUrl'];
+
+    for (const field of candidateFields) {
+      const fieldValue = imageObject[field];
+
+      if (typeof fieldValue === 'string' && fieldValue.trim()) {
+        return fieldValue;
+      }
+    }
+  }
+
+  return '';
+};
+
+const toImageSrc = (value: unknown) => {
+  const imageValue = extractImageCandidate(value);
+
+  if (!imageValue.trim()) {
+    return '';
+  }
+
+  return resolveImageUrl(imageValue);
 };
 
 const normalizeFeedbacks = async (payload: unknown): Promise<Feedback[]> => {
@@ -104,9 +180,13 @@ const normalizeLocationDetails = async (
   await ensureCategoriesCache();
 
   const rawImages = Array.isArray(location.images) ? location.images : [];
+  const primaryImage =
+    typeof location.image === 'string' && location.image.trim()
+      ? location.image
+      : '';
   const imageCandidate =
-    location.image ??
-    rawImages.find((item) => typeof item === 'string' && item.trim()) ??
+    primaryImage ||
+    rawImages.find((item) => extractImageCandidate(item)) ||
     '';
 
   const ownerId =
@@ -175,6 +255,7 @@ const normalizeLocationDetails = async (
     authorName,
     image: toImageSrc(imageCandidate),
     rate: Number(location.rate ?? location.rating ?? 0),
+    locationType: rawType ? findTypeLabel(rawType, locationTypesCache) : '',
     regionName:
       typeof location.regionName === 'string' && location.regionName
         ? findRegionLabel(location.regionName, regionsCache)
@@ -248,7 +329,33 @@ export const getLocationFeedbacks = async (locationId: string): Promise<Feedback
 export const getLocationById = async (locationId: string) => {
   try {
     const res = await api.get(`/locations/${locationId}`);
-    return await normalizeLocationDetails(res.data.data);
+    const normalizedLocation = await normalizeLocationDetails(res.data.data);
+
+    if (normalizedLocation?.image) {
+      return normalizedLocation;
+    }
+
+    const fallbackRes = await api.get('/locations', {
+      params: { page: 1, limit: 1000 },
+    });
+    const items = Array.isArray(fallbackRes.data?.data) ? fallbackRes.data.data : [];
+    const fallbackLocation = items.find(
+      (item: Record<string, unknown>) => String(item._id) === locationId,
+    );
+    const fallbackNormalized = await normalizeLocationDetails(fallbackLocation);
+
+    return {
+      ...fallbackNormalized,
+      ...normalizedLocation,
+      ownerId: normalizedLocation?.ownerId || fallbackNormalized?.ownerId || '',
+      authorName: normalizedLocation?.authorName || fallbackNormalized?.authorName || '',
+      locationType:
+        normalizedLocation?.locationType || fallbackNormalized?.locationType || '',
+      locationTypeName:
+        normalizedLocation?.locationTypeName || fallbackNormalized?.locationTypeName || '',
+      regionName: normalizedLocation?.regionName || fallbackNormalized?.regionName || '',
+      image: normalizedLocation?.image || fallbackNormalized?.image || '',
+    };
   } catch {
     try {
       const fallbackRes = await api.get('/locations', {

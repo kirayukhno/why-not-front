@@ -58,12 +58,13 @@ export async function POST(req: NextRequest) {
       throw new Error('Location id is required');
     }
 
-    const response = await api.post('/feedback', {
-      ...payload,
-      locationId,
-    }, {
-      headers: { Cookie: cookieHeader },
-    });
+    const response = await api.post(
+      `/feedback/locations/${locationId}/feedbacks`,
+      payload,
+      {
+        headers: { Cookie: cookieHeader },
+      },
+    );
 
     return NextResponse.json(response.data, { status: response.status });
   } catch (error) {

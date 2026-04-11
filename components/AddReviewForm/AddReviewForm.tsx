@@ -5,6 +5,7 @@ import { Formik, Form, Field, ErrorMessage, FormikHelpers } from 'formik';
 import * as Yup from 'yup';
 import css from './AddReviewForm.module.css';
 import { useAuth } from '@/hooks/useAuth';
+import { createFeedback } from '@/lib/api/clientApi';
 
 interface AddReviewFormProps {
   locationId: string;
@@ -15,16 +16,6 @@ interface AddReviewFormProps {
 interface ReviewFormValues {
   description: string;
   rate: number;
-}
-
-interface CreateReviewPayload {
-  locationId: string;
-  description: string;
-  rate: number;
-}
-
-interface CreateReviewResponse {
-  message?: string;
 }
 
 type StarVariant = 'empty' | 'selected';
@@ -66,26 +57,6 @@ function StarIcon({ variant }: StarIconProps) {
   );
 }
 
-async function createReview(payload: CreateReviewPayload): Promise<CreateReviewResponse> {
-  const response = await fetch('/api/feedback', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(payload),
-  });
-
-  const data = (await response.json().catch(() => null)) as { message?: string; error?: string } | null;
-
-  if (!response.ok) {
-    throw new Error(data?.message || data?.error || 'Не вдалося надіслати відгук');
-  }
-
-  return {
-    message: data?.message || 'Відгук успішно надіслано',
-  };
-}
-
 export default function AddReviewForm({ locationId, onCancel, onSuccess }: AddReviewFormProps) {
   const [serverError, setServerError] = useState('');
   const [hoveredRating, setHoveredRating] = useState(0);
@@ -104,8 +75,7 @@ export default function AddReviewForm({ locationId, onCancel, onSuccess }: AddRe
     setServerError('');
 
     try {
-      await createReview({
-        locationId,
+      await createFeedback(locationId, {
         description: values.description.trim(),
         rate: values.rate,
       });

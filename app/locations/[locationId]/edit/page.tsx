@@ -8,6 +8,42 @@ type EditLocationPageProps = {
   }>;
 };
 
+const extractRelationValue = (value: unknown, nestedKey: string) => {
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (value && typeof value === 'object') {
+    const source = value as Record<string, unknown>;
+
+    return String(source._id || source.slug || source[nestedKey] || '');
+  }
+
+  return '';
+};
+
+const extractImageValue = (value: unknown) => {
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    const firstImage = value[0];
+
+    return extractImageValue(firstImage);
+  }
+
+  if (value && typeof value === 'object') {
+    const source = value as Record<string, unknown>;
+
+    return String(
+      source.url || source.secure_url || source.path || source.src || source.imageUrl || '',
+    );
+  }
+
+  return '';
+};
+
 export default async function EditLocationPage({
   params,
 }: EditLocationPageProps) {
@@ -43,7 +79,7 @@ export default async function EditLocationPage({
       : '');
 
   if (!currentUserId) {
-    redirect(`/sign-in?from=${encodeURIComponent(`/locations/${locationId}/edit`)}`);
+    redirect(`/login?from=${encodeURIComponent(`/locations/${locationId}/edit`)}`);
   }
 
   if (!ownerId || ownerId !== currentUserId) {
@@ -53,10 +89,12 @@ export default async function EditLocationPage({
   const initialData = {
     _id: String(rawLocation._id || locationId),
     name: String(rawLocation.name || ''),
-    type: String(rawLocation.type || rawLocation.locationType || ''),
-    region: String(rawLocation.region || ''),
+    type:
+      extractRelationValue(rawLocation.type, 'type') ||
+      extractRelationValue(rawLocation.locationType, 'type'),
+    region: extractRelationValue(rawLocation.region, 'region'),
     description: String(rawLocation.description || ''),
-    image: typeof rawLocation.image === 'string' ? rawLocation.image : '',
+    image: extractImageValue(rawLocation.image) || extractImageValue(rawLocation.images),
   };
 
   return (

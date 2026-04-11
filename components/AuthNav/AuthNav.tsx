@@ -10,14 +10,14 @@ export default function AuthNav() {
   return (
     <nav className={styles.nav}>
       <Link
-        href="/sign-up"
-        className={`${styles.link} ${pathname === "/sign-up" ? styles.active : ""}`}
+        href="/register"
+        className={`${styles.link} ${pathname === "/register" ? styles.active : ""}`}
       >
         Реєстрація
       </Link>
       <Link
-        href="/sign-in"
-        className={`${styles.link} ${pathname === "/sign-in" ? styles.active : ""}`}
+        href="/login"
+        className={`${styles.link} ${pathname === "/login" ? styles.active : ""}`}
       >
         Вхід
       </Link>

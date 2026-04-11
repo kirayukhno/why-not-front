@@ -6,13 +6,18 @@ import { api } from "../../api";
 
 export async function POST() {
   const cookieStore = await cookies();
+  const cookieHeader = cookieStore
+    .getAll()
+    .map((cookie) => `${cookie.name}=${cookie.value}`)
+    .join("; ");
+
   try {
     await api.post(
       "/auth/logout",
       {},
       {
         headers: {
-          Cookie: cookieStore.toString(),
+          Cookie: cookieHeader,
         },
       },
     );

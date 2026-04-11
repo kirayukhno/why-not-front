@@ -6,7 +6,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import * as Yup from "yup";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
-import { register, type RegisterData, clientUserService } from "@/lib/api/clientApi";
+import {
+  login,
+  register,
+  type RegisterData,
+  clientUserService,
+} from "@/lib/api/clientApi";
 import styles from "./RegistrationForm.module.css";
 
 const initialValues: RegisterData = {
@@ -42,16 +47,26 @@ export default function RegistrationForm() {
   ) => {
     try {
       await register(values);
+      let user = await clientUserService.getCurrentUser();
+
+      if (!user?.id && !user?._id) {
+        await login({
+          email: values.email,
+          password: values.password,
+        });
+        user = await clientUserService.getCurrentUser();
+      }
+
       await queryClient.invalidateQueries({ queryKey: ["authSession"] });
-      const user = await clientUserService.getCurrentUser();
+      await queryClient.refetchQueries({ queryKey: ["authSession"] });
 
       if (user?.id || user?._id) {
         toast.success("Реєстрація успішна");
-        router.push(redirectTo);
+        router.push(redirectTo || `/profile/${user.id || user._id}`);
         router.refresh();
       } else {
         toast.success("Реєстрація успішна. Увійдіть у свій акаунт.");
-        router.push(`/sign-in?registered=1&from=${encodeURIComponent(redirectTo)}`);
+        router.push(`/login?registered=1&from=${encodeURIComponent(redirectTo)}`);
       }
     } catch (error) {
       toast.error(

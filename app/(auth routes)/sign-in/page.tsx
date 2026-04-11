@@ -1,11 +1,5 @@
-import AuthNav from "@/components/AuthNav/AuthNav";
-import LoginForm from "@/components/LoginForm/LoginForm";
+import { redirect } from "next/navigation";
 
 export default function LoginPage() {
-  return (
-    <div>
-      <AuthNav />
-      <LoginForm />
-    </div>
-  );
+  redirect("/login");
 }
